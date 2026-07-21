@@ -40,6 +40,30 @@
   .wrap{ max-width: 980px; margin: 0 auto; padding: 40px 24px 0; }
   a{ color: var(--teal-bright); }
 
+  /* ---------- Sticky day nav ---------- */
+  .day-nav{
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,34,36,0.92); backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+    overflow-x: auto; white-space: nowrap;
+    padding: 10px 16px;
+    -ms-overflow-style: none; scrollbar-width: none;
+  }
+  .day-nav::-webkit-scrollbar{ display:none; }
+  .day-nav-inner{ display:inline-flex; gap: 6px; max-width: 980px; margin: 0 auto; }
+  .day-pill{
+    display:inline-flex; flex-direction:column; align-items:center; justify-content:center;
+    padding: 6px 12px; border-radius: 10px; cursor: pointer; flex-shrink:0;
+    border: 1px solid transparent; transition: background .15s ease, border-color .15s ease;
+  }
+  .day-pill:hover{ background: rgba(255,255,255,0.05); }
+  .day-pill .pn-day{ font-size: 10px; text-transform:uppercase; letter-spacing:0.05em; color: var(--ink-on-dark-dim); }
+  .day-pill .pn-date{ font-size: 13px; font-weight:700; color: var(--ink-on-dark); }
+  .day-pill.is-active{ background: rgba(234,106,78,0.16); border-color: var(--coral); }
+  .day-pill.is-active .pn-date{ color: var(--coral); }
+  .day-pill .pn-dot{ width:5px; height:5px; border-radius:50%; background: var(--teal-bright); margin-top:3px; }
+  .day-pill.is-peak .pn-dot{ background: var(--coral); }
+
   /* ---------- Hero ---------- */
   .eyebrow{
     font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
@@ -106,20 +130,23 @@
   .trail-day{ flex:1; text-align:center; font-size: 10.5px; color: var(--ink-on-dark-dim); }
   .trail-day b{ display:block; color: var(--ink-on-dark); font-size: 12.5px; font-weight:600; margin-top:1px; }
 
-  /* ---------- Today spotlight ---------- */
-  .today-card{
+  /* ---------- Full day cards (stacked, scrollable) ---------- */
+  .day-list{ display:flex; flex-direction:column; gap: 22px; margin: 30px 0; }
+  .day-full-card{
     background: var(--paper); color: var(--ink); border-radius: 18px;
-    padding: 26px 26px 22px; margin: 30px 0; position: relative;
+    padding: 26px 26px 22px; position: relative;
     box-shadow: 0 20px 50px -20px rgba(0,0,0,0.5);
+    scroll-margin-top: 76px;
   }
-  .today-card .kicker{
+  .day-full-card.is-today{ outline: 2px solid var(--coral); outline-offset: 3px; }
+  .day-full-card .kicker{
     font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700;
     color: var(--coral-dim); margin-bottom: 6px;
   }
-  .today-card h2{
+  .day-full-card h2{
     font-family:'Fraunces',serif; font-weight: 600; font-size: 25px; margin: 0 0 10px;
   }
-  .today-card p.desc{ margin: 0 0 16px; color: var(--ink-soft); font-size: 14.5px; line-height:1.55; }
+  .day-full-card p.desc{ margin: 0 0 16px; color: var(--ink-soft); font-size: 14.5px; line-height:1.55; }
   .badge-row{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom: 16px; }
   .badge{
     font-size: 11.5px; font-weight: 600; padding: 4px 10px; border-radius: 100px;
@@ -135,40 +162,17 @@
   .detail .dv{ font-size: 13.5px; line-height: 1.5; }
   .detail .dv a{ color: var(--ink); font-weight: 600; text-decoration: underline; text-decoration-color: var(--coral); text-underline-offset: 2px; }
 
-  /* ---------- Day grid ---------- */
-  .grid-label{ font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-on-dark-dim); margin: 34px 0 14px; }
-  .day-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-  @media (max-width: 760px){ .day-grid{ grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 480px){ .day-grid{ grid-template-columns: 1fr; } }
-
-  .day-card{
-    background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
-    padding: 16px; cursor: pointer; transition: border-color .15s ease, transform .15s ease;
-  }
-  .day-card:hover{ border-color: var(--teal-bright); transform: translateY(-2px); }
-  .day-card.active{ border-color: var(--coral); background: rgba(234,106,78,0.08); }
-  .day-card .dc-date{ font-size: 11px; color: var(--ink-on-dark-dim); text-transform: uppercase; letter-spacing:0.06em; margin-bottom: 4px; }
-  .day-card .dc-title{ font-family:'Fraunces',serif; font-weight: 600; font-size: 15.5px; color:#fff; line-height:1.25; margin-bottom: 8px; min-height: 38px; }
-  .dc-tag{ display:inline-block; font-size: 10.5px; font-weight: 700; padding: 3px 8px; border-radius: 100px; }
-  .tag-rest{ background: rgba(79,179,163,0.18); color: var(--teal-bright); }
-  .tag-active{ background: rgba(209,165,60,0.18); color: var(--gold); }
-  .tag-peak{ background: rgba(234,106,78,0.2); color: var(--coral); }
-
   /* ---------- Footer checklist ---------- */
   .footer{
     margin-top: 46px; border-top: 1px solid var(--line); padding-top: 26px;
-    display:grid; grid-template-columns: 1.3fr 1fr; gap: 30px;
+    max-width: 460px;
   }
-  @media (max-width: 680px){ .footer{ grid-template-columns: 1fr; } }
   .footer h3{ font-family:'Fraunces',serif; font-size: 16px; font-weight:600; color:#fff; margin: 0 0 12px; }
   .check-item{ display:flex; align-items:flex-start; gap: 10px; font-size: 13.5px; padding: 7px 0; border-bottom: 1px solid var(--line); color: var(--ink-on-dark); }
   .check-item:last-child{ border-bottom:none; }
   .check-item .box{ width:16px; height:16px; border-radius:5px; border:1.5px solid var(--teal-bright); flex-shrink:0; margin-top:1px; }
   .check-item .box.done{ background: var(--teal-bright); position:relative; }
   .check-item .box.done::after{ content:'✓'; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:11px; color: var(--bg-deep); font-weight:900; }
-  .savings-line{ display:flex; justify-content:space-between; font-size: 13.5px; padding: 7px 0; border-bottom: 1px solid var(--line); }
-  .savings-line:last-child{ border-bottom: none; font-weight: 700; color: #fff; padding-top: 12px; }
-  .savings-line span:last-child{ color: var(--gold); font-weight: 600; }
 
   .legend{ display:flex; gap:16px; flex-wrap:wrap; font-size:11.5px; color: var(--ink-on-dark-dim); margin-top: 10px; }
   .legend span{ display:inline-flex; align-items:center; gap:5px; }
@@ -176,11 +180,26 @@
 
   /* ---------- Location icon + conditions ---------- */
   .loc-row{ display:flex; align-items:center; gap:12px; margin-bottom:14px; }
+  .loc-name-row{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .directions-link{
+    font-size: 11.5px; font-weight: 700; color: var(--coral-dim); text-decoration: none;
+    display:inline-flex; align-items:center; gap:4px; border: 1px solid rgba(183,79,57,0.35);
+    padding: 3px 9px; border-radius: 100px; white-space: nowrap;
+  }
+  .directions-link:hover{ background: rgba(183,79,57,0.08); }
   .loc-icon{
     width:56px; height:56px; border-radius:12px; flex-shrink:0;
     background: rgba(28,43,38,0.06); display:flex; align-items:center; justify-content:center;
   }
   .loc-icon svg{ width:32px; height:32px; }
+  .photo-banner{
+    width: 100%; aspect-ratio: 16/7; border-radius: 12px; overflow: hidden;
+    margin-bottom: 16px; background: rgba(28,43,38,0.06);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .photo-banner img{ width:100%; height:100%; object-fit: cover; display:block; }
+  .photo-banner.no-photo{ display:none; }
+  .photo-banner .ph-fallback{ width:64px; height:64px; opacity:0.35; }
   .loc-name{ font-size:12px; text-transform:uppercase; letter-spacing:0.06em; color: var(--ink-soft); font-weight:700; }
   .conditions{
     display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0 4px;
@@ -198,6 +217,7 @@
 </style>
 </head>
 <body>
+<nav class="day-nav" id="dayNav"><div class="day-nav-inner" id="dayNavInner"></div></nav>
 <div class="wrap">
 
   <div class="eyebrow">Bingham Family · Kauaʻi 2026</div>
@@ -224,32 +244,36 @@
     </div>
   </div>
 
-  <div class="today-card" id="todayCard"></div>
-
-  <div class="grid-label">Full itinerary — tap any day</div>
-  <div class="day-grid" id="dayGrid"></div>
+  <div class="day-list" id="dayList"></div>
 
   <div class="footer">
     <div>
       <h3>Booking checklist</h3>
       <div id="checklist"></div>
     </div>
-    <div>
-      <h3>Budget swaps so far</h3>
-      <div id="savings"></div>
-    </div>
   </div>
 
 </div>
 
 <script>
+function gmapsDirections(lat, lon){
+  return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}&travelmode=driving`;
+}
+function mapSearch(query){
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+}
+function mapLink(label, query){
+  return `<a href="${mapSearch(query)}" target="_blank" rel="noopener">${label}</a>`;
+}
+
 const LOCATIONS = {
-  poipu:  { name: "Poipu",         lat: 21.8746, lon: -159.4657, icon: "beach" },
-  waimea: { name: "Kōkeʻe / Waimea Canyon", lat: 22.1333, lon: -159.6500, icon: "canyon" },
-  haena:  { name: "Hāʻena / Nā Pali trailhead", lat: 22.2202, lon: -159.5738, icon: "trail" },
-  portallen: { name: "Port Allen", lat: 21.9036, lon: -159.5917, icon: "boat" },
-  wailua: { name: "Wailua",        lat: 22.0522, lon: -159.3389, icon: "river" }
+  poipu:  { name: "Poipu",         lat: 21.8746, lon: -159.4657, icon: "beach", photo: "photos/poipu.jpg" },
+  waimea: { name: "Kōkeʻe / Waimea Canyon", lat: 22.1333, lon: -159.6500, icon: "canyon", photo: "photos/waimea-canyon.jpg" },
+  haena:  { name: "Hāʻena / Nā Pali trailhead", lat: 22.2202, lon: -159.5738, icon: "trail", photo: "photos/haena-trail.jpg" },
+  portallen: { name: "Port Allen", lat: 21.9036, lon: -159.5917, icon: "boat", photo: "photos/na-pali-boat.jpg" },
+  wailua: { name: "Wailua",        lat: 22.0522, lon: -159.3389, icon: "river", photo: "photos/wailua-river.jpg" }
 };
+Object.values(LOCATIONS).forEach(loc => { loc.directions = gmapsDirections(loc.lat, loc.lon); });
 
 const ICONS = {
   beach: `<svg viewBox="0 0 48 48" fill="none" stroke="#1c2b26" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 34c4-3 8-3 12 0s8 3 12 0 8-3 12 0 8-3 8-3"/><path d="M24 26V8"/><path d="M24 10c6 0 10 4 10 4s-6 3-10 3-10-3-10-3 4-4 10-4z" fill="#1c2b26" fill-opacity="0.06"/><circle cx="36" cy="12" r="4"/></svg>`,
@@ -267,7 +291,7 @@ const DAYS = [
     desc: "Land at 6:58pm — by the time you clear the airport and drive to Poipu (~30–40 min), it's after 8pm. Tonight is landing only.",
     gear: "Travel clothes, chargers, meds in carry-on, cash for tipping",
     lunch: "—",
-    dinner: "Living Foods Market & Cafe (Kukuiʻula) — deli counter, no reservation needed",
+    dinner: `${mapLink("Living Foods Market & Cafe", "Living Foods Market and Cafe, Poipu, HI")} (Kukuiʻula) — deli counter, no reservation needed`,
     links: [],
     notes: ["Light grocery run at Kukuiʻula Market for tonight + tomorrow AM only — save the full stock-up for Monday."]
   },
@@ -277,8 +301,8 @@ const DAYS = [
     tag: "rest", elevation: 1, loc: "poipu",
     desc: "Full grocery run at Big Save Koloa, then beach/pool to shake off travel. Optional easy evening walk on the Māhāʻulepu Heritage Trail.",
     gear: "Swimsuits, reef-safe sunscreen, towels, water shoes, cooler bags",
-    lunch: "Big Save poke bar or Kukuiʻula Market's Maki Sushi counter",
-    dinner: "Home-cooked with tonight's groceries — or Keoki's Paradise if eating out",
+    lunch: `${mapLink("Big Save", "Big Save Market, Koloa, HI")} poke bar or ${mapLink("Kukuiʻula Market", "Kukuiula Market, Koloa, HI")}'s Maki Sushi counter`,
+    dinner: `Home-cooked with tonight's groceries — or ${mapLink("Keoki's Paradise", "Keoki's Paradise, Poipu, HI")} if eating out`,
     links: [],
     notes: ["Big Save Koloa, 5516 Koloa Rd — produce, meat, seafood, poke bar, bakery.", "Costco (Lihue) for bulk items if you want it — easiest on the drive in from the airport."]
   },
@@ -288,8 +312,8 @@ const DAYS = [
     tag: "rest", elevation: 1, loc: "poipu",
     desc: "Snorkel postponed — a south swell has surf at High Surf Advisory levels on south-facing shores today into tomorrow. Keep it loose: pool time, or Poipu Beach Park for swimming (not snorkeling).",
     gear: "Swimsuits, sunscreen, hats",
-    lunch: "Kukuiʻula Market or Living Foods Market & Cafe",
-    dinner: "Eating House 1849 (Koloa) — reservation recommended",
+    lunch: `${mapLink("Kukuiʻula Market", "Kukuiula Market, Koloa, HI")} or ${mapLink("Living Foods Market & Cafe", "Living Foods Market and Cafe, Poipu, HI")}`,
+    dinner: `${mapLink("Eating House 1849", "Eating House 1849, Koloa, HI")} (Koloa) — reservation recommended`,
     links: [],
     notes: ["Snorkel attempt moved to Friday — swell should be fading by then."],
     weather: true
@@ -300,8 +324,8 @@ const DAYS = [
     tag: "active", elevation: 2, loc: "waimea",
     desc: "\u201cGrand Canyon of the Pacific,\u201d ~1 hr drive. Scenic overlooks, short easy walks — low exertion, doubles as your pre-hike prep day. Pack hike gear tonight.",
     gear: "Light layer (cooler at elevation), sneakers, sunscreen, hat, water, snacks",
-    lunch: "Ishihara Market (Waimea town) bentos/poke — verify still open; backups: Wrangler's Steakhouse, Shrimp Station",
-    dinner: "Beach House Restaurant — sunset on the water, book ahead",
+    lunch: `${mapLink("Ishihara Market", "Ishihara Market, Waimea, HI")} (Waimea town) bentos/poke — verify still open; backups: ${mapLink("Wrangler's Steakhouse", "Wrangler's Steakhouse, Waimea, HI")}, ${mapLink("Shrimp Station", "Shrimp Station, Waimea, HI")}`,
+    dinner: `${mapLink("Beach House Restaurant", "The Beach House Restaurant, Poipu, HI")} — sunset on the water, book ahead`,
     links: [{label:"Park info", url:"https://dlnr.hawaii.gov/dsp/parks/kauai/waimea-canyon-state-park/"}],
     notes: ["No early wake-up needed tomorrow — the shuttle isn't until 12:30pm."]
   },
@@ -311,8 +335,8 @@ const DAYS = [
     tag: "peak", elevation: 4, loc: "haena",
     desc: "Kalalau Trail to Hanakapiai Beach, 4 mi round trip. Shuttle from Waipā Park & Ride, 12:30pm departure. Normal wake-up — leave Poipu ~10:15am for the ~2 hr drive.",
     gear: "Real-traction hiking shoes, 2–3L water/person, trail snacks, sunscreen, rain layer, dry bag, first aid, spare socks, cash/ID for shuttle",
-    lunch: "Grab-and-go from Big Save/Kukuiʻula before heading out",
-    dinner: "Keoki's Paradise — casual, open till 10pm, forgiving of a later arrival",
+    lunch: `Grab-and-go from ${mapLink("Big Save", "Big Save Market, Koloa, HI")}/${mapLink("Kukuiʻula Market", "Kukuiula Market, Koloa, HI")} before heading out`,
+    dinner: `${mapLink("Keoki's Paradise", "Keoki's Paradise, Poipu, HI")} — casual, open till 10pm, forgiving of a later arrival`,
     links: [{label:"Shuttle reservation (booked)", url:"https://gohaena.com/"}],
     notes: ["✅ Reserved: Jul 23, 12:30pm shuttle."],
     booked: true
@@ -324,7 +348,7 @@ const DAYS = [
     desc: "Sore legs, sleep in. Best shot to retry self-guided snorkel at Lawai Beach — check conditions again that morning, since another swell was expected Thursday.",
     gear: "Rented mask/snorkel/fins, rash guard, sunscreen, water shoes, dry bag",
     lunch: "Leftovers or a quick deli run",
-    dinner: "Bubba Burgers (Shops at Kukuiʻula) — casual comfort food",
+    dinner: `${mapLink("Bubba Burgers", "Bubba Burgers, Poipu, HI")} (Shops at Kukuiʻula) — casual comfort food`,
     links: [],
     notes: ["Gear rental: Nukumoi Surf Shop, ~$25/person for the week (alt: Seasport Divers, Boss Frog's).", "Budget swap saved ~$400 vs. the guided tour."],
     budget: true
@@ -335,8 +359,8 @@ const DAYS = [
     tag: "rest", elevation: 1, loc: "poipu",
     desc: "The real local Saturday night — Old Sugar Mill Park in Koloa Town for rotating food trucks, then Poipu Beach at sunset to watch honu (sea turtles) come ashore.",
     gear: "Cash for food trucks, light evening layer, camera (no flash near turtles)",
-    lunch: "Poke/bento from Big Save or Kukuiʻula Market for the beach",
-    dinner: "Old Sugar Mill Park food trucks — Kickshaws and rotating local vendors",
+    lunch: `Poke/bento from ${mapLink("Big Save", "Big Save Market, Koloa, HI")} or ${mapLink("Kukuiʻula Market", "Kukuiula Market, Koloa, HI")} for the beach`,
+    dinner: `${mapLink("Old Sugar Mill Park", "Old Sugar Mill Park, Koloa, HI")} food trucks — Kickshaws and rotating local vendors`,
     links: [],
     notes: ["Swapped the resort luau for this — no booking needed, just show up.", "Keeps the night genuinely local instead of a tourist production."],
     budget: true
@@ -348,7 +372,7 @@ const DAYS = [
     desc: "Catamaran from Port Allen (~20 min from Poipu). Sea caves, waterfalls, wildlife, and a second snorkel stop included.",
     gear: "Swimsuit, motion-sickness meds if needed, sunscreen, hat w/ strap, windbreaker, dry bag",
     lunch: "Usually included on board — confirm when booking",
-    dinner: "Drift Kauai (Kalaheo) — casual, good cocktails and bar food",
+    dinner: `${mapLink("Drift Kauai", "Drift Kauai, Kalaheo, HI")} — casual, good cocktails and bar food`,
     links: [{label:"Book tour", url:"https://www.napali.com/"}],
     notes: ["Priciest outing left on the trip — a cheaper raft operator (~$169/person) is worth a look if budget's tight."]
   },
@@ -358,8 +382,8 @@ const DAYS = [
     tag: "active", elevation: 2, loc: "wailua",
     desc: "Optional kayak-and-hike to Secret (Uluwehi) Falls, East Side. Also your weather/reschedule buffer if anything earlier needs to move.",
     gear: "Swimsuit, water shoes, dry bag, sunscreen, change of clothes",
-    lunch: "Bubba Burgers Kapaa if going self-guided (guided tours often include lunch)",
-    dinner: "Lava Lava Beach Club (Wailua) — feet-in-the-sand casual",
+    lunch: `${mapLink("Bubba Burgers Kapaa", "Bubba Burgers, Kapaa, HI")} if going self-guided (guided tours often include lunch)`,
+    dinner: `Stay on the East Side for ${mapLink("Lava Lava Beach Club", "Lava Lava Beach Club, Wailua, HI")} — feet-in-the-sand casual`,
     links: [],
     notes: ["Self-rental kayak (~$50–70/double) instead of a guided tour saves roughly $450 for the family."],
     budget: true
@@ -381,12 +405,6 @@ const CHECKLIST = [
   { label: "Hāʻena State Park shuttle — Jul 23, 12:30pm", done: true },
   { label: "Self-guided snorkel gear rental — Fri Jul 24", done: false },
   { label: "Na Pali boat tour + snorkel — Jul 26", done: false }
-];
-
-const SAVINGS = [
-  { label: "Guided snorkel → self-guided", value: "~$400" },
-  { label: "Resort luau → local food trucks", value: "~$180" },
-  { label: "Guided kayak → self-rental", value: "~$450" }
 ];
 
 function toDate(s){ const [y,m,d]=s.split('-').map(Number); return new Date(y, m-1, d); }
@@ -437,7 +455,7 @@ DAYS.forEach((d,i)=>{
   dot.style.bottom = ((1 - (1 - d.elevation/4))*0 + (100 - yFor(d.elevation)))+'%'; // placeholder, corrected below
   dot.style.bottom = (100 - yFor(d.elevation)) + '%';
   dot.title = d.title;
-  dot.onclick = ()=>selectDay(i);
+  dot.onclick = ()=>scrollToDay(i);
   if(i===todayIdx){
     const flag = document.createElement('div');
     flag.className='flag';
@@ -454,24 +472,20 @@ DAYS.forEach(d=>{
   trailDaysEl.appendChild(el);
 });
 
-// ---- Day grid ----
-const gridEl = document.getElementById('dayGrid');
+// ---- Day nav pills ----
+const dayNavInner = document.getElementById('dayNavInner');
 DAYS.forEach((d,i)=>{
-  const card = document.createElement('div');
-  card.className = 'day-card' + (i===todayIdx?' active':'');
-  card.onclick = ()=>selectDay(i);
-  const tagClass = d.tag==='peak' ? 'tag-peak' : (d.tag==='active' ? 'tag-active' : 'tag-rest');
-  const tagLabel = d.tag==='peak' ? 'Big day' : (d.tag==='active' ? 'Active' : 'Easy');
-  const loc = LOCATIONS[d.loc];
-  card.innerHTML = `
-    <div class="dc-date">${d.short}, ${d.label}</div>
-    <div class="dc-title">${d.title}</div>
-    <span class="dc-tag ${tagClass}">${tagLabel}</span>
-    <div class="mini-loc">${ICONS[loc.icon]}<span>${loc.name}</span></div>
-  `;
-  card.dataset.idx = i;
-  gridEl.appendChild(card);
+  const pill = document.createElement('div');
+  pill.className = 'day-pill' + (d.tag==='peak' ? ' is-peak' : '') + (i===todayIdx ? ' is-active' : '');
+  pill.dataset.idx = i;
+  pill.innerHTML = `<span class="pn-day">${d.short}</span><span class="pn-date">${d.label.split(' ')[1]}</span><span class="pn-dot"></span>`;
+  pill.onclick = ()=>scrollToDay(i);
+  dayNavInner.appendChild(pill);
 });
+
+function scrollToDay(i){
+  document.getElementById('day-'+i).scrollIntoView({ behavior:'smooth', block:'start' });
+}
 
 // ---- Live weather (NWS, no key needed) ----
 const weatherCache = {};
@@ -528,12 +542,12 @@ function renderConditionsLoading(){
   </div>`;
 }
 
-async function renderConditions(i, requestToken){
+async function renderConditions(i){
   const d = DAYS[i];
-  const el = document.getElementById('conditionsBox');
+  const el = document.getElementById('conditionsBox-'+i);
+  if(!el) return;
   try{
     const [forecastMap, tideMap] = await Promise.all([getForecastForLocation(d.loc), getTideMap()]);
-    if(el.dataset.token != requestToken) return; // a newer selection has since happened
     const fc = forecastMap[d.date];
     const tides = tideMap[d.date] || [];
     const weatherHtml = fc
@@ -547,20 +561,14 @@ async function renderConditions(i, requestToken){
       <div class="cond-block"><div class="dl">Tides · nearest station (Nawiliwili)</div><div class="cv">${tideHtml}</div></div>
     `;
   } catch(e){
-    if(el.dataset.token != requestToken) return;
     el.innerHTML = `<div class="cond-block"><div class="dl">Weather &amp; Tides</div><div class="cv muted">Live data unavailable right now (offline or blocked request). Try reloading, or check weather.gov / tidesandcurrents.noaa.gov directly.</div></div>`;
   }
 }
 
-let conditionsToken = 0;
-
-function selectDay(i){
-  const d = DAYS[i];
-  document.querySelectorAll('.trail-pt').forEach((el,idx)=>{
-    el.style.boxShadow = idx===i ? '0 0 0 5px rgba(79,179,163,0.28)' : '';
-  });
-  document.querySelectorAll('.day-card').forEach((el)=> el.classList.toggle('active', Number(el.dataset.idx)===i));
-
+// ---- Render every day as a full card, stacked and scrollable ----
+const dayListEl = document.getElementById('dayList');
+DAYS.forEach((d,i)=>{
+  const loc = LOCATIONS[d.loc];
   let badges = '';
   if(d.budget) badges += `<span class="badge budget">💰 Budget swap</span>`;
   if(d.weather) badges += `<span class="badge weather">🌊 Weather-dependent</span>`;
@@ -568,20 +576,29 @@ function selectDay(i){
 
   let linksHtml = d.links.map(l=>`<a href="${l.url}" target="_blank" rel="noopener">${l.label} ↗</a>`).join('<br>');
   let notesHtml = d.notes.length ? `<ul style="margin:10px 0 0;padding-left:18px;font-size:13px;color:var(--ink-soft);line-height:1.6;">${d.notes.map(n=>`<li>${n}</li>`).join('')}</ul>` : '';
-  const loc = LOCATIONS[d.loc];
 
-  conditionsToken++;
-  const myToken = conditionsToken;
-
-  document.getElementById('todayCard').innerHTML = `
+  const card = document.createElement('div');
+  card.className = 'day-full-card' + (i===todayIdx ? ' is-today' : '');
+  card.id = 'day-'+i;
+  card.dataset.idx = i;
+  card.innerHTML = `
     <div class="kicker">${i===todayIdx ? (statusLabel || 'Today') : (d.short + ', ' + d.label)}</div>
+    <div class="photo-banner" id="photo-${i}">
+      <img src="${loc.photo}" alt="${loc.name}" onerror="this.parentElement.classList.add('no-photo')">
+    </div>
     <div class="loc-row">
       <div class="loc-icon">${ICONS[loc.icon]}</div>
-      <div><h2 style="margin:0;">${d.title}</h2><div class="loc-name">${loc.name}</div></div>
+      <div>
+        <h2 style="margin:0;">${d.title}</h2>
+        <div class="loc-name-row">
+          <div class="loc-name">${loc.name}</div>
+          <a class="directions-link" href="${loc.directions}" target="_blank" rel="noopener">📍 Directions ↗</a>
+        </div>
+      </div>
     </div>
     <p class="desc">${d.desc}</p>
     <div class="badge-row">${badges}</div>
-    <div id="conditionsBox" data-token="${myToken}">${renderConditionsLoading()}</div>
+    <div id="conditionsBox-${i}">${renderConditionsLoading()}</div>
     <div class="detail-grid">
       <div class="detail"><div class="dl">Gear</div><div class="dv">${d.gear}</div></div>
       <div class="detail"><div class="dl">Lunch</div><div class="dv">${d.lunch}</div></div>
@@ -590,20 +607,34 @@ function selectDay(i){
     </div>
     ${notesHtml}
   `;
-  document.getElementById('conditionsBox').dataset.token = myToken;
-  renderConditions(i, myToken);
-}
+  dayListEl.appendChild(card);
+  renderConditions(i);
+});
 
-// ---- Checklist & savings ----
+// ---- Scroll-spy: keep the sticky nav (and trail marker) synced to what's in view ----
+const navPills = Array.from(dayNavInner.children);
+const observer = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    const idx = Number(entry.target.dataset.idx);
+    if(entry.isIntersecting){
+      navPills.forEach((p,pi)=> p.classList.toggle('is-active', pi===idx));
+      const activePill = navPills[idx];
+      if(activePill) activePill.scrollIntoView({ behavior:'smooth', block:'nearest', inline:'center' });
+    }
+  });
+}, { rootMargin: '-90px 0px -60% 0px', threshold: 0 });
+document.querySelectorAll('.day-full-card').forEach(card => observer.observe(card));
+
+// ---- Checklist ----
 document.getElementById('checklist').innerHTML = CHECKLIST.map(c=>`
   <div class="check-item"><div class="box ${c.done?'done':''}"></div><div>${c.label}</div></div>
 `).join('');
 
-document.getElementById('savings').innerHTML = SAVINGS.map(s=>`
-  <div class="savings-line"><span>${s.label}</span><span>${s.value}</span></div>
-`).join('') + `<div class="savings-line"><span>Total saved</span><span>${totalSavings}</span></div>`;
+// ---- Auto-scroll to today's card on load ----
+window.addEventListener('load', ()=>{
+  setTimeout(()=>{ scrollToDay(todayIdx); }, 150);
+});
 
-selectDay(todayIdx);
 </script>
 </body>
 </html>
