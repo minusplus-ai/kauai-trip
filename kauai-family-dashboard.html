@@ -6,6 +6,8 @@
 <title>Bingham Kauai Trip — Jul 19–28, 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <style>
   :root{
     --bg: #0d2a2c;
@@ -89,14 +91,14 @@
 
   /* ---------- Stat strip ---------- */
   .stats{
-    display:grid; grid-template-columns: repeat(4,1fr); gap: 1px;
+    display:grid; grid-template-columns: repeat(3,1fr); gap: 1px;
     background: var(--line); border: 1px solid var(--line); border-radius: 14px;
     overflow: hidden; margin: 28px 0 8px;
   }
   .stat{ background: var(--bg-deep); padding: 16px 14px; }
   .stat .n{ font-family:'Fraunces',serif; font-weight:600; font-size: 24px; color:#fff; line-height:1; }
   .stat .l{ font-size: 11px; color: var(--ink-on-dark-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 6px; }
-  @media (max-width: 640px){ .stats{ grid-template-columns: repeat(2,1fr); } }
+  @media (max-width: 640px){ .stats{ grid-template-columns: repeat(3,1fr); } }
 
   /* ---------- Trail elevation timeline (signature element) ---------- */
   .trail-section{ margin: 40px 0 10px; }
@@ -152,7 +154,6 @@
     font-size: 11.5px; font-weight: 600; padding: 4px 10px; border-radius: 100px;
     display:inline-flex; align-items:center; gap:5px;
   }
-  .badge.budget{ background: rgba(209,165,60,0.18); color: #8a6a1e; }
   .badge.weather{ background: rgba(79,179,163,0.18); color: #1d6e60; }
   .badge.booked{ background: rgba(28,43,38,0.08); color: var(--ink); }
   .detail-grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 14px; }
@@ -200,6 +201,19 @@
   .photo-banner img{ width:100%; height:100%; object-fit: cover; display:block; }
   .photo-banner.no-photo{ display:none; }
   .photo-banner .ph-fallback{ width:64px; height:64px; opacity:0.35; }
+
+  .day-map{
+    width: 100%; height: 200px; border-radius: 12px; overflow: hidden;
+    margin: 16px 0; background: rgba(28,43,38,0.06);
+    border: 1px solid var(--line-paper);
+  }
+  .day-map .leaflet-tooltip{
+    font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;
+    border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .map-legend{ display:flex; gap:14px; font-size:11px; color: var(--ink-soft); margin: -8px 0 16px; }
+  .map-legend span{ display:inline-flex; align-items:center; gap:5px; }
+  .map-legend i{ width:8px; height:8px; border-radius:50%; display:inline-block; }
   .loc-name{ font-size:12px; text-transform:uppercase; letter-spacing:0.06em; color: var(--ink-soft); font-weight:700; }
   .conditions{
     display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0 4px;
@@ -268,10 +282,10 @@ function mapLink(label, query){
 
 const LOCATIONS = {
   poipu:  { name: "Poipu",         lat: 21.8746, lon: -159.4657, icon: "beach", photo: "photos/poipu.jpg" },
-  waimea: { name: "Kōkeʻe / Waimea Canyon", lat: 22.1333, lon: -159.6500, icon: "canyon", photo: "photos/waimea-canyon.jpg" },
-  haena:  { name: "Hāʻena / Nā Pali trailhead", lat: 22.2202, lon: -159.5738, icon: "trail", photo: "photos/haena-trail.jpg" },
-  portallen: { name: "Port Allen", lat: 21.9036, lon: -159.5917, icon: "boat", photo: "photos/na-pali-boat.jpg" },
-  wailua: { name: "Wailua",        lat: 22.0522, lon: -159.3389, icon: "river", photo: "photos/wailua-river.jpg" }
+  waimea: { name: "Kōkeʻe / Waimea Canyon", lat: 22.1333, lon: -159.6500, icon: "canyon", photo: "Trip%20Photos/Waimea_Canyon_Trail/waimea%20canyon.webp" },
+  haena:  { name: "Hāʻena / Nā Pali trailhead", lat: 22.2202, lon: -159.5738, icon: "trail", photo: "Trip%20Photos/Hanakapiai_Beach/imgi_39_iStock-155600390-scaled-1-1.jpg" },
+  portallen: { name: "Port Allen", lat: 21.9036, lon: -159.5917, icon: "boat", photo: "Trip%20Photos/Hanakapiai_Beach/imgi_17_4-2048x1152.jpg" },
+  wailua: { name: "Wailua",        lat: 22.0522, lon: -159.3389, icon: "river", photo: "Trip%20Photos/Hanakapiai_Beach/imgi_33_2-2048x1303.jpg" }
 };
 Object.values(LOCATIONS).forEach(loc => { loc.directions = gmapsDirections(loc.lat, loc.lon); });
 
@@ -288,6 +302,10 @@ const DAYS = [
     date: "2026-07-19", short: "Sun", label: "Jul 19",
     title: "Arrival (evening)",
     tag: "rest", elevation: 0, loc: "poipu",
+    stops: [
+      { name: "Poipu", lat: 21.8746, lon: -159.4657, role: "main" },
+      { name: "Living Foods Market & Cafe", lat: 21.8846, lon: -159.4696, role: "dinner" }
+    ],
     desc: "Land at 6:58pm — by the time you clear the airport and drive to Poipu (~30–40 min), it's after 8pm. Tonight is landing only.",
     gear: "Travel clothes, chargers, meds in carry-on, cash for tipping",
     lunch: "—",
@@ -300,6 +318,11 @@ const DAYS = [
     title: "Grocery Stock-Up + Ease In",
     tag: "rest", elevation: 1, loc: "poipu",
     desc: "Full grocery run at Big Save Koloa, then beach/pool to shake off travel. Optional easy evening walk on the Māhāʻulepu Heritage Trail.",
+    stops: [
+      { name: "Poipu", lat: 21.8746, lon: -159.4657, role: "main" },
+      { name: "Big Save Market", lat: 21.9048, lon: -159.4629, role: "lunch" },
+      { name: "Keoki's Paradise", lat: 21.8790, lon: -159.4598, role: "dinner" }
+    ],
     gear: "Swimsuits, reef-safe sunscreen, towels, water shoes, cooler bags",
     lunch: `${mapLink("Big Save", "Big Save Market, Koloa, HI")} poke bar or ${mapLink("Kukuiʻula Market", "Kukuiula Market, Koloa, HI")}'s Maki Sushi counter`,
     dinner: `Home-cooked with tonight's groceries — or ${mapLink("Keoki's Paradise", "Keoki's Paradise, Poipu, HI")} if eating out`,
@@ -311,6 +334,11 @@ const DAYS = [
     title: "Open Beach / Pool Day",
     tag: "rest", elevation: 1, loc: "poipu",
     desc: "Snorkel postponed — a south swell has surf at High Surf Advisory levels on south-facing shores today into tomorrow. Keep it loose: pool time, or Poipu Beach Park for swimming (not snorkeling).",
+    stops: [
+      { name: "Poipu Beach Park", lat: 21.8746, lon: -159.4657, role: "main" },
+      { name: "Kukuiʻula Market", lat: 21.8849, lon: -159.4684, role: "lunch" },
+      { name: "Eating House 1849", lat: 21.8840, lon: -159.4698, role: "dinner" }
+    ],
     gear: "Swimsuits, sunscreen, hats",
     lunch: `${mapLink("Kukuiʻula Market", "Kukuiula Market, Koloa, HI")} or ${mapLink("Living Foods Market & Cafe", "Living Foods Market and Cafe, Poipu, HI")}`,
     dinner: `${mapLink("Eating House 1849", "Eating House 1849, Koloa, HI")} (Koloa) — reservation recommended`,
@@ -323,6 +351,11 @@ const DAYS = [
     title: "Waimea Canyon",
     tag: "active", elevation: 2, loc: "waimea",
     desc: "\u201cGrand Canyon of the Pacific,\u201d ~1 hr drive. Scenic overlooks, short easy walks — low exertion, doubles as your pre-hike prep day. Pack hike gear tonight.",
+    stops: [
+      { name: "Waimea Canyon Lookout", lat: 22.0718, lon: -159.6616, role: "main" },
+      { name: "Ishihara Market", lat: 21.9544, lon: -159.6672, role: "lunch" },
+      { name: "Beach House Restaurant", lat: 21.8812, lon: -159.4754, role: "dinner" }
+    ],
     gear: "Light layer (cooler at elevation), sneakers, sunscreen, hat, water, snacks",
     lunch: `${mapLink("Ishihara Market", "Ishihara Market, Waimea, HI")} (Waimea town) bentos/poke — verify still open; backups: ${mapLink("Wrangler's Steakhouse", "Wrangler's Steakhouse, Waimea, HI")}, ${mapLink("Shrimp Station", "Shrimp Station, Waimea, HI")}`,
     dinner: `${mapLink("Beach House Restaurant", "The Beach House Restaurant, Poipu, HI")} — sunset on the water, book ahead`,
@@ -334,6 +367,10 @@ const DAYS = [
     title: "Hanakapiai Beach Hike",
     tag: "peak", elevation: 4, loc: "haena",
     desc: "Kalalau Trail to Hanakapiai Beach, 4 mi round trip. Shuttle from Waipā Park & Ride, 12:30pm departure. Normal wake-up — leave Poipu ~10:15am for the ~2 hr drive.",
+    stops: [
+      { name: "Kalalau Trailhead", lat: 22.2204, lon: -159.5826, role: "main" },
+      { name: "Keoki's Paradise", lat: 21.8790, lon: -159.4598, role: "dinner" }
+    ],
     gear: "Real-traction hiking shoes, 2–3L water/person, trail snacks, sunscreen, rain layer, dry bag, first aid, spare socks, cash/ID for shuttle",
     lunch: `Grab-and-go from ${mapLink("Big Save", "Big Save Market, Koloa, HI")}/${mapLink("Kukuiʻula Market", "Kukuiula Market, Koloa, HI")} before heading out`,
     dinner: `${mapLink("Keoki's Paradise", "Keoki's Paradise, Poipu, HI")} — casual, open till 10pm, forgiving of a later arrival`,
@@ -346,53 +383,71 @@ const DAYS = [
     title: "Recovery Day + Snorkel Retry",
     tag: "active", elevation: 2, loc: "poipu",
     desc: "Sore legs, sleep in. Best shot to retry self-guided snorkel at Lawai Beach — check conditions again that morning, since another swell was expected Thursday.",
+    stops: [
+      { name: "Lawai Beach", lat: 21.8823, lon: -159.4760, role: "main" },
+      { name: "Bubba Burgers", lat: 21.8830, lon: -159.4692, role: "dinner" }
+    ],
     gear: "Rented mask/snorkel/fins, rash guard, sunscreen, water shoes, dry bag",
     lunch: "Leftovers or a quick deli run",
     dinner: `${mapLink("Bubba Burgers", "Bubba Burgers, Poipu, HI")} (Shops at Kukuiʻula) — casual comfort food`,
     links: [],
-    notes: ["Gear rental: Nukumoi Surf Shop, ~$25/person for the week (alt: Seasport Divers, Boss Frog's).", "Budget swap saved ~$400 vs. the guided tour."],
-    budget: true
+    notes: ["Gear rental: Nukumoi Surf Shop, ~$25/person for the week (alt: Seasport Divers, Boss Frog's)."]
   },
   {
     date: "2026-07-25", short: "Sat", label: "Jul 25",
     title: "Koloa Food Trucks + Turtle Watching",
     tag: "rest", elevation: 1, loc: "poipu",
     desc: "The real local Saturday night — Old Sugar Mill Park in Koloa Town for rotating food trucks, then Poipu Beach at sunset to watch honu (sea turtles) come ashore.",
+    stops: [
+      { name: "Old Sugar Mill Park", lat: 21.9048, lon: -159.4658, role: "main" },
+      { name: "Poipu Beach", lat: 21.8746, lon: -159.4657, role: "dinner" }
+    ],
     gear: "Cash for food trucks, light evening layer, camera (no flash near turtles)",
     lunch: `Poke/bento from ${mapLink("Big Save", "Big Save Market, Koloa, HI")} or ${mapLink("Kukuiʻula Market", "Kukuiula Market, Koloa, HI")} for the beach`,
     dinner: `${mapLink("Old Sugar Mill Park", "Old Sugar Mill Park, Koloa, HI")} food trucks — Kickshaws and rotating local vendors`,
     links: [],
-    notes: ["Swapped the resort luau for this — no booking needed, just show up.", "Keeps the night genuinely local instead of a tourist production."],
-    budget: true
+    notes: ["Swapped the resort luau for this — no booking needed, just show up.", "Keeps the night genuinely local instead of a tourist production."]
   },
   {
     date: "2026-07-26", short: "Sun", label: "Jul 26",
     title: "Na Pali Coast Boat Tour",
     tag: "peak", elevation: 3, loc: "portallen",
     desc: "Catamaran from Port Allen (~20 min from Poipu). Sea caves, waterfalls, wildlife, and a second snorkel stop included.",
+    stops: [
+      { name: "Port Allen Small Boat Harbor", lat: 21.9015, lon: -159.5895, role: "main" },
+      { name: "Drift Kauai", lat: 21.9229, lon: -159.5078, role: "dinner" }
+    ],
     gear: "Swimsuit, motion-sickness meds if needed, sunscreen, hat w/ strap, windbreaker, dry bag",
     lunch: "Usually included on board — confirm when booking",
     dinner: `${mapLink("Drift Kauai", "Drift Kauai, Kalaheo, HI")} — casual, good cocktails and bar food`,
     links: [{label:"Book tour", url:"https://www.napali.com/"}],
-    notes: ["Priciest outing left on the trip — a cheaper raft operator (~$169/person) is worth a look if budget's tight."]
+    notes: ["Priciest outing left on the trip — a cheaper raft operator (~$169/person) is worth a look if you'd rather spend less here."]
   },
   {
     date: "2026-07-27", short: "Mon", label: "Jul 27",
     title: "Wailua River / Flex Day",
     tag: "active", elevation: 2, loc: "wailua",
     desc: "Optional kayak-and-hike to Secret (Uluwehi) Falls, East Side. Also your weather/reschedule buffer if anything earlier needs to move.",
+    stops: [
+      { name: "Wailua River", lat: 22.0522, lon: -159.3389, role: "main" },
+      { name: "Bubba Burgers", lat: 22.0774, lon: -159.3171, role: "lunch" },
+      { name: "Lava Lava Beach Club", lat: 22.0520, lon: -159.3290, role: "dinner" }
+    ],
     gear: "Swimsuit, water shoes, dry bag, sunscreen, change of clothes",
     lunch: `${mapLink("Bubba Burgers Kapaa", "Bubba Burgers, Kapaa, HI")} if going self-guided (guided tours often include lunch)`,
     dinner: `Stay on the East Side for ${mapLink("Lava Lava Beach Club", "Lava Lava Beach Club, Wailua, HI")} — feet-in-the-sand casual`,
     links: [],
-    notes: ["Self-rental kayak (~$50–70/double) instead of a guided tour saves roughly $450 for the family."],
-    budget: true
+    notes: ["Self-rental kayak (~$50–70/double) instead of a guided tour saves roughly $450 for the family."]
   },
   {
     date: "2026-07-28", short: "Tue", label: "Jul 28",
     title: "Departure",
     tag: "rest", elevation: 0, loc: "poipu",
     desc: "Last swim, pack up, fly home.",
+    stops: [
+      { name: "Poipu", lat: 21.8746, lon: -159.4657, role: "main" },
+      { name: "Lihue Airport", lat: 21.9788, lon: -159.3438, role: "dinner" }
+    ],
     gear: "Boarding passes, wet gear in a separate bag, buffer time to Lihue airport",
     lunch: "Light breakfast at the Airbnb; grab-and-go near Lihue if needed",
     dinner: "—",
@@ -426,11 +481,9 @@ if(todayIdx === -1){
 
 // ---- Stat strip ----
 const bookedCount = CHECKLIST.filter(c=>c.done).length;
-const totalSavings = "~$1,030";
 document.getElementById('statStrip').innerHTML = `
   <div class="stat"><div class="n">${DAYS.length}</div><div class="l">Days on island</div></div>
   <div class="stat"><div class="n">${bookedCount}/${CHECKLIST.length}</div><div class="l">Booked</div></div>
-  <div class="stat"><div class="n">${totalSavings}</div><div class="l">Saved on tours</div></div>
   <div class="stat"><div class="n">1</div><div class="l">Hike, one shot</div></div>
 `;
 
@@ -513,6 +566,14 @@ async function getForecastForLocation(locKey){
   return p;
 }
 
+function to12Hour(hhmm){
+  let [h, m] = hhmm.split(':').map(Number);
+  const period = h >= 12 ? 'PM' : 'AM';
+  h = h % 12;
+  if(h === 0) h = 12;
+  return `${h}:${String(m).padStart(2,'0')}${period}`;
+}
+
 // ---- Live tides (NOAA CO-OPS, nearest station: Nawiliwili) ----
 let tideCache = null;
 async function getTideMap(){
@@ -528,7 +589,7 @@ async function getTideMap(){
     (data.predictions || []).forEach(pr => {
       const dateStr = pr.t.slice(0,10);
       if(!byDate[dateStr]) byDate[dateStr] = [];
-      byDate[dateStr].push({ time: pr.t.slice(11,16), type: pr.type, height: parseFloat(pr.v).toFixed(1) });
+      byDate[dateStr].push({ time: to12Hour(pr.t.slice(11,16)), type: pr.type, height: parseFloat(pr.v).toFixed(1) });
     });
     return byDate;
   })();
@@ -570,7 +631,6 @@ const dayListEl = document.getElementById('dayList');
 DAYS.forEach((d,i)=>{
   const loc = LOCATIONS[d.loc];
   let badges = '';
-  if(d.budget) badges += `<span class="badge budget">💰 Budget swap</span>`;
   if(d.weather) badges += `<span class="badge weather">🌊 Weather-dependent</span>`;
   if(d.booked) badges += `<span class="badge booked">✓ Booked</span>`;
 
@@ -599,6 +659,11 @@ DAYS.forEach((d,i)=>{
     <p class="desc">${d.desc}</p>
     <div class="badge-row">${badges}</div>
     <div id="conditionsBox-${i}">${renderConditionsLoading()}</div>
+    <div class="day-map" id="map-${i}"></div>
+    <div class="map-legend">
+      <span><i style="background:var(--coral)"></i> Main stop</span>
+      <span><i style="background:var(--teal-bright)"></i> Lunch/Dinner</span>
+    </div>
     <div class="detail-grid">
       <div class="detail"><div class="dl">Gear</div><div class="dv">${d.gear}</div></div>
       <div class="detail"><div class="dl">Lunch</div><div class="dv">${d.lunch}</div></div>
@@ -609,7 +674,38 @@ DAYS.forEach((d,i)=>{
   `;
   dayListEl.appendChild(card);
   renderConditions(i);
+  renderDayMap(i);
 });
+
+// ---- Per-day map (Leaflet + free CartoDB basemap, no API key needed) ----
+function renderDayMap(i){
+  const d = DAYS[i];
+  const el = document.getElementById('map-'+i);
+  if(!el || !d.stops || !d.stops.length || typeof L === 'undefined') return;
+  const map = L.map(el, { scrollWheelZoom: false, attributionControl: false });
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    maxZoom: 18,
+    attribution: '&copy; OpenStreetMap &copy; CARTO'
+  }).addTo(map);
+
+  const colorFor = role => role === 'main' ? '#ea6a4e' : '#3fa79a';
+  const latlngs = [];
+  d.stops.forEach(s => {
+    const marker = L.circleMarker([s.lat, s.lon], {
+      radius: s.role === 'main' ? 9 : 7,
+      color: '#fff', weight: 2,
+      fillColor: colorFor(s.role), fillOpacity: 0.95
+    }).addTo(map);
+    marker.bindTooltip(s.name, { direction: 'top', offset: [0, -6] });
+    latlngs.push([s.lat, s.lon]);
+  });
+
+  if(latlngs.length > 1){
+    map.fitBounds(latlngs, { padding: [30, 30] });
+  } else {
+    map.setView(latlngs[0], 13);
+  }
+}
 
 // ---- Scroll-spy: keep the sticky nav (and trail marker) synced to what's in view ----
 const navPills = Array.from(dayNavInner.children);
