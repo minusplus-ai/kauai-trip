@@ -23,6 +23,8 @@
     --coral-dim: #b74f39;
     --teal-bright: #4fb3a3;
     --gold: #d1a53c;
+    --safe-green: #3f8a5c;
+    --safe-red: #c23b3b;
     --line: rgba(223,234,230,0.14);
     --line-paper: rgba(28,43,38,0.12);
   }
@@ -217,9 +219,31 @@
     font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;
     border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   }
+  .map-weather-chip{
+    background: rgba(255,255,255,0.95); border-radius: 100px;
+    padding: 5px 11px; font-family: 'Inter', sans-serif; font-size: 12.5px; font-weight: 700;
+    color: #1c2b26; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    display:flex; align-items:center; gap:5px; white-space:nowrap;
+    margin: 8px 8px 0 0;
+  }
+  .map-weather-chip .muted{ font-weight:500; color:#4a5a54; }
   .map-legend{ display:flex; gap:14px; font-size:11px; color: var(--ink-soft); margin: -8px 0 16px; }
   .map-legend span{ display:inline-flex; align-items:center; gap:5px; }
   .map-legend i{ width:8px; height:8px; border-radius:50%; display:inline-block; }
+
+  .beach-safety{ margin: -4px 0 16px; }
+  .beach-safety .dl{ font-size:10.5px; text-transform:uppercase; letter-spacing:0.08em; color: var(--coral-dim); font-weight:700; margin-bottom:8px; }
+  .safety-row{ display:flex; align-items:center; gap:8px; font-size:13px; padding:4px 0; }
+  .safety-pill{
+    display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:700;
+    padding:3px 9px; border-radius:100px; flex-shrink:0; color:#fff;
+  }
+  .safety-pill.low{ background: var(--safe-green); }
+  .safety-pill.caution{ background: var(--gold); color:#3a2c05; }
+  .safety-pill.high{ background: var(--safe-red); }
+  .safety-name{ color: var(--ink-on-dark); }
+  .safety-link{ font-size:11.5px; color: var(--teal-bright); margin-left:auto; white-space:nowrap; }
+  .safety-disclaimer{ font-size:11px; color: var(--ink-on-dark-dim); margin-top:8px; line-height:1.5; }
   .loc-name{ font-size:12px; text-transform:uppercase; letter-spacing:0.06em; color: var(--ink-soft); font-weight:700; }
   .conditions{
     display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0 4px;
@@ -390,12 +414,12 @@ const DAYS = [
       { time: "7:00 PM", activity: "Arrive Poipu, dinner" }
     ],
     stops: [
-      { name: "Lydgate Beach Park", lat: 22.0372, lon: -159.3364, role: "lunch" },
+      { name: "Lydgate Beach Park", lat: 22.0372, lon: -159.3364, role: "lunch", safety: { level: "low", label: "Normal Conditions", url: "https://safebeachday.com/lydgate/" } },
       { name: "Kilauea Lighthouse", lat: 22.2317, lon: -159.4020, role: "lunch" },
-      { name: "Anini Beach", lat: 22.2252, lon: -159.4494, role: "main" },
-      { name: "Hanalei Bay", lat: 22.2028, lon: -159.5047, role: "dinner" },
-      { name: "Tunnels Beach", lat: 22.2239, lon: -159.5611, role: "dinner" },
-      { name: "Kēʻe Beach", lat: 22.2235, lon: -159.5798, role: "dinner" }
+      { name: "Anini Beach", lat: 22.2252, lon: -159.4494, role: "main", safety: { level: "low", label: "Normal Conditions", url: "https://safebeachday.com/county/kauai/" } },
+      { name: "Hanalei Bay", lat: 22.2028, lon: -159.5047, role: "dinner", safety: { level: "low", label: "Normal Conditions", url: "https://safebeachday.com/hanalei/" } },
+      { name: "Tunnels Beach", lat: 22.2239, lon: -159.5611, role: "dinner", safety: { level: "caution", label: "Caution", url: "https://safebeachday.com/ha-ena/" } },
+      { name: "Kēʻe Beach", lat: 22.2235, lon: -159.5798, role: "dinner", safety: { level: "caution", label: "Caution", url: "https://safebeachday.com/kee/" } }
     ],
     gear: "Swimsuits, snorkel gear (already rented), water shoes, reef-safe sunscreen, towels, cash for parking/snacks",
     lunch: `${mapLink("Lydgate Beach Park", "Lydgate Beach Park, Kauai, HI")} — enclosed pools, safest snorkel water on the island, good stop on the way up`,
@@ -456,6 +480,7 @@ const DAYS = [
     ],
     stops: [
       { name: "Kalalau Trailhead", lat: 22.2204, lon: -159.5826, role: "main" },
+      { name: "Hanakapiai Beach", lat: 22.2103, lon: -159.6069, role: "lunch", safety: { level: "high", label: "High Hazard — no swimming", url: "https://safebeachday.com/ha-ena/" } },
       { name: "Keoki's Paradise", lat: 21.8790, lon: -159.4598, role: "dinner" }
     ],
     gear: "Real-traction hiking shoes, 2–3L water/person, trail snacks, sunscreen, rain layer, dry bag, first aid, spare socks, cash/ID for shuttle",
@@ -479,7 +504,7 @@ const DAYS = [
       { time: "6:30 PM", activity: "Dinner — Bubba Burgers" }
     ],
     stops: [
-      { name: "Lawai Beach", lat: 21.8823, lon: -159.4760, role: "main" },
+      { name: "Lawai Beach", lat: 21.8823, lon: -159.4760, role: "main", safety: { level: "caution", label: "Caution", url: "https://safebeachday.com/county/kauai/" } },
       { name: "Bubba Burgers", lat: 21.8830, lon: -159.4692, role: "dinner" }
     ],
     gear: "Rented mask/snorkel/fins, rash guard, sunscreen, water shoes, dry bag",
@@ -723,11 +748,47 @@ async function getTideMap(){
   return tideCache;
 }
 
+function weatherIcon(shortForecast){
+  const s = (shortForecast || '').toLowerCase();
+  if(s.includes('thunder')) return '⛈️';
+  if(s.includes('rain') || s.includes('shower')) return '🌦️';
+  if(s.includes('cloud') && !s.includes('partly') && !s.includes('mostly')) return '☁️';
+  if(s.includes('partly') || s.includes('mostly cloud')) return '⛅';
+  if(s.includes('sunny') || s.includes('clear')) return '☀️';
+  return '🌤️';
+}
+
 function renderConditionsLoading(){
   return `<div class="conditions">
     <div class="cond-block"><div class="dl">Weather</div><div class="cv muted">Loading live forecast…</div></div>
     <div class="cond-block"><div class="dl">Tides (Nawiliwili)</div><div class="cv muted">Loading tide predictions…</div></div>
   </div>`;
+}
+
+function parseMaxWind(windSpeedStr){
+  if(!windSpeedStr) return 0;
+  const nums = windSpeedStr.match(/\d+/g);
+  if(!nums) return 0;
+  return Math.max(...nums.map(Number));
+}
+
+// Live-adjusts each beach's baseline safety level using today's actual NWS wind/weather —
+// escalates (never de-escalates below the known baseline hazard, e.g. Hanakapiai stays High regardless).
+function liveSafetyLevel(baseLevel, fc){
+  if(!fc) return { level: baseLevel, reason: '' };
+  const wind = parseMaxWind(fc.windSpeed);
+  const rough = /thunder|heavy rain|storm/i.test(fc.shortForecast || '');
+  const order = { low: 0, caution: 1, high: 2 };
+  let level = baseLevel;
+  let reason = '';
+  if(rough){
+    level = order[level] < order.high ? 'high' : level;
+    reason = ` — ${fc.shortForecast.toLowerCase()} today`;
+  } else if(wind >= 20){
+    level = order[level] < order.caution ? 'caution' : level;
+    reason = ` — ${wind}mph wind today`;
+  }
+  return { level, reason };
 }
 
 async function renderConditions(i){
@@ -748,7 +809,25 @@ async function renderConditions(i){
       <div class="cond-block"><div class="dl">Weather · ${LOCATIONS[d.loc].name}</div>${weatherHtml}</div>
       <div class="cond-block"><div class="dl">Tides · nearest station (Nawiliwili)</div><div class="cv">${tideHtml}</div></div>
     `;
+    const mapChip = document.getElementById('map-weather-'+i);
+    if(mapChip){
+      mapChip.innerHTML = fc
+        ? `${weatherIcon(fc.shortForecast)} <span>${fc.temperature}°${fc.temperatureUnit}</span>`
+        : `<span class="muted">No forecast yet</span>`;
+    }
+    const levelLabel = { low: "Normal", caution: "Caution", high: "High Hazard" };
+    (d.stops || []).forEach((s, si) => {
+      if(!s.safety) return;
+      const pill = document.getElementById(`safety-pill-${i}-${si}`);
+      if(!pill) return;
+      const { level, reason } = liveSafetyLevel(s.safety.level, fc);
+      pill.className = 'safety-pill ' + level;
+      pill.textContent = levelLabel[level];
+      pill.title = fc ? `${levelLabel[level]}${reason}` : 'Baseline estimate — no live forecast yet for this date';
+    });
   } catch(e){
+    const mapChip = document.getElementById('map-weather-'+i);
+    if(mapChip) mapChip.innerHTML = `<span class="muted">Weather unavailable</span>`;
     el.innerHTML = `<div class="cond-block"><div class="dl">Weather &amp; Tides</div><div class="cv muted">Live data unavailable right now (offline or blocked request). Try reloading, or check weather.gov / tidesandcurrents.noaa.gov directly.</div></div>`;
   }
 }
@@ -764,6 +843,23 @@ DAYS.forEach((d,i)=>{
   let linksHtml = d.links.map(l=>`<a href="${l.url}" target="_blank" rel="noopener">${l.label} ↗</a>`).join('<br>');
   let areaInfoHtml = (loc.info || []).map(l=>`<a href="${l.url}" target="_blank" rel="noopener">${l.label} ↗</a>`).join('<br>');
   let notesHtml = d.notes.length ? `<ul style="margin:10px 0 0;padding-left:18px;font-size:13px;color:var(--ink-soft);line-height:1.6;">${d.notes.map(n=>`<li>${n}</li>`).join('')}</ul>` : '';
+
+  const safetyStops = (d.stops || []).filter(s => s.safety);
+  const levelLabel = { low: "Normal", caution: "Caution", high: "High Hazard" };
+  let beachSafetyHtml = '';
+  if(safetyStops.length){
+    beachSafetyHtml = `<div class="beach-safety">
+      <div class="dl">Beach Safety <span class="muted" style="font-weight:500;text-transform:none;letter-spacing:0;">— updates live</span></div>
+      ${safetyStops.map((s,si) => `
+        <div class="safety-row">
+          <span class="safety-pill ${s.safety.level}" id="safety-pill-${i}-${si}">${levelLabel[s.safety.level]}</span>
+          <span class="safety-name">${s.name}</span>
+          <a class="safety-link" href="${s.safety.url}" target="_blank" rel="noopener">Check live conditions ↗</a>
+        </div>
+      `).join('')}
+      <div class="safety-disclaimer">Auto-recalculated from live NWS wind &amp; weather data each time this page loads — this is our own simplified estimate, not SafeBeachDay's official feed (no public API exists for that). Always check safebeachday.com or with a lifeguard before swimming.</div>
+    </div>`;
+  }
 
   const card = document.createElement('div');
   card.className = 'day-full-card' + (i===todayIdx ? ' is-today' : '');
@@ -793,6 +889,7 @@ DAYS.forEach((d,i)=>{
       <span><i style="background:var(--coral)"></i> Main stop</span>
       <span><i style="background:var(--teal-bright)"></i> Lunch/Dinner</span>
     </div>
+    ${beachSafetyHtml}
     <div class="detail-grid">
       <div class="detail"><div class="dl">Gear</div><div class="dv">${d.gear}</div></div>
       <div class="detail"><div class="dl">Lunch</div><div class="dv">${d.lunch}</div></div>
@@ -818,6 +915,15 @@ function renderDayMap(i){
     attribution: '&copy; OpenStreetMap &copy; CARTO'
   }).addTo(map);
 
+  const weatherControl = L.control({ position: 'topright' });
+  weatherControl.onAdd = function(){
+    const div = L.DomUtil.create('div', 'map-weather-chip');
+    div.id = 'map-weather-' + i;
+    div.innerHTML = `<span class="muted">Loading…</span>`;
+    return div;
+  };
+  weatherControl.addTo(map);
+
   const colorFor = role => role === 'main' ? '#ea6a4e' : '#3fa79a';
   const latlngs = [];
   d.stops.forEach(s => {
@@ -826,7 +932,8 @@ function renderDayMap(i){
       color: '#fff', weight: 2,
       fillColor: colorFor(s.role), fillOpacity: 0.95
     }).addTo(map);
-    marker.bindTooltip(s.name, { direction: 'top', offset: [0, -6] });
+    const tooltipText = s.safety ? `${s.name} — ${({low:'Normal',caution:'Caution',high:'High Hazard'})[s.safety.level]}` : s.name;
+    marker.bindTooltip(tooltipText, { direction: 'top', offset: [0, -6] });
     latlngs.push([s.lat, s.lon]);
   });
 
