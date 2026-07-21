@@ -158,6 +158,12 @@
   .badge.booked{ background: rgba(28,43,38,0.08); color: var(--ink); }
   .detail-grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 14px; }
   @media (max-width: 560px){ .detail-grid{ grid-template-columns: 1fr; } }
+
+  .schedule{ margin: 16px 0; border-top: 1px solid var(--line-paper); border-bottom: 1px solid var(--line-paper); padding: 12px 0; }
+  .schedule .dl{ font-size:10.5px; text-transform:uppercase; letter-spacing:0.08em; color: var(--coral-dim); font-weight:700; margin-bottom:8px; }
+  .sched-row{ display:flex; gap:12px; padding: 5px 0; font-size: 13.5px; line-height:1.4; }
+  .sched-time{ flex-shrink:0; width:74px; font-weight:700; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .sched-activity{ color: var(--ink-soft); }
   .detail{ border-top: 1px solid var(--line-paper); padding-top: 10px; }
   .detail .dl{ font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--coral-dim); font-weight: 700; margin-bottom: 5px; }
   .detail .dv{ font-size: 13.5px; line-height: 1.5; }
@@ -281,11 +287,33 @@ function mapLink(label, query){
 }
 
 const LOCATIONS = {
-  poipu:  { name: "Poipu",         lat: 21.8746, lon: -159.4657, icon: "beach", photo: "Trip%20Photos/Poipu%20Area/poipu-beach-park-b1.jpg" },
-  waimea: { name: "Kōkeʻe / Waimea Canyon", lat: 22.1333, lon: -159.6500, icon: "canyon", photo: "Trip%20Photos/Waimea_Canyon_Trail/waimea%20canyon.webp" },
-  haena:  { name: "Hāʻena / Nā Pali trailhead", lat: 22.2202, lon: -159.5738, icon: "trail", photo: "Trip%20Photos/Hanakapiai_Beach/imgi_39_iStock-155600390-scaled-1-1.jpg" },
-  portallen: { name: "Port Allen", lat: 21.9036, lon: -159.5917, icon: "boat", photo: "Trip%20Photos/Hanakapiai_Beach/imgi_17_4-2048x1152.jpg" },
-  wailua: { name: "Wailua",        lat: 22.0522, lon: -159.3389, icon: "river", photo: "Trip%20Photos/Wailua%20River/IH-Kauai-Wailua-River-5.jpg" }
+  poipu:  { name: "Poipu",         lat: 21.8746, lon: -159.4657, icon: "beach", photo: "Trip%20Photos/Poipu%20Area/poipu-beach-park-b1.jpg",
+    info: [
+      { label: "Poipu Beach Park — Go Hawaii", url: "https://www.gohawaii.com/islands/kauai/regions/south-shore/poipu-beach-park" },
+      { label: "Current ocean/surf conditions — Hawaii Ocean Safety", url: "https://hioceansafety.com/" }
+    ]
+  },
+  waimea: { name: "Kōkeʻe / Waimea Canyon", lat: 22.1333, lon: -159.6500, icon: "canyon", photo: "Trip%20Photos/Waimea_Canyon_Trail/waimea%20canyon.webp",
+    info: [
+      { label: "Waimea Canyon State Park — DLNR", url: "https://dlnr.hawaii.gov/dsp/parks/kauai/waimea-canyon-state-park/" }
+    ]
+  },
+  haena:  { name: "Hāʻena / Nā Pali trailhead", lat: 22.2202, lon: -159.5738, icon: "trail", photo: "Trip%20Photos/Hanakapiai_Beach/imgi_39_iStock-155600390-scaled-1-1.jpg",
+    info: [
+      { label: "Hāʻena State Park reservations — gohaena.com", url: "https://gohaena.com/" },
+      { label: "Nā Pali Coast State Wilderness Park — DLNR", url: "https://dlnr.hawaii.gov/dsp/parks/kauai/napali-coast-state-wilderness-park/park-info/" }
+    ]
+  },
+  portallen: { name: "Port Allen", lat: 21.9036, lon: -159.5917, icon: "boat", photo: "Trip%20Photos/Hanakapiai_Beach/imgi_17_4-2048x1152.jpg",
+    info: [
+      { label: "Port Allen Small Boat Harbor — DLNR DOBOR", url: "https://dlnr.hawaii.gov/dobor/port-allen-small-boat-harbor/" }
+    ]
+  },
+  wailua: { name: "Wailua",        lat: 22.0522, lon: -159.3389, icon: "river", photo: "Trip%20Photos/Wailua%20River/IH-Kauai-Wailua-River-5.jpg",
+    info: [
+      { label: "Wailua River State Park — DLNR", url: "https://dlnr.hawaii.gov/dsp/parks/kauai/wailua-river-state-park/" }
+    ]
+  }
 };
 Object.values(LOCATIONS).forEach(loc => { loc.directions = gmapsDirections(loc.lat, loc.lon); });
 
@@ -307,6 +335,12 @@ const DAYS = [
       { name: "Living Foods Market & Cafe", lat: 21.8846, lon: -159.4696, role: "dinner" }
     ],
     desc: "Land at 6:58pm — by the time you clear the airport and drive to Poipu (~30–40 min), it's after 8pm. Tonight is landing only.",
+    schedule: [
+      { time: "6:58 PM", activity: "Land at Lihue Airport" },
+      { time: "7:30 PM", activity: "Rental car pickup" },
+      { time: "8:15 PM", activity: "Arrive Poipu, check into Airbnb" },
+      { time: "8:30 PM", activity: "Quick dinner — Living Foods Market & Cafe" }
+    ],
     gear: "Travel clothes, chargers, meds in carry-on, cash for tipping",
     lunch: "—",
     dinner: `${mapLink("Living Foods Market & Cafe", "Living Foods Market and Cafe, Poipu, HI")} (Kukuiʻula) — deli counter, no reservation needed`,
@@ -318,6 +352,14 @@ const DAYS = [
     title: "Grocery Stock-Up + Ease In",
     tag: "rest", elevation: 1, loc: "poipu",
     desc: "Full grocery run at Big Save Koloa, then beach/pool to shake off travel. Optional easy evening walk on the Māhāʻulepu Heritage Trail.",
+    schedule: [
+      { time: "9:00 AM", activity: "Big Save Koloa — full grocery stock-up" },
+      { time: "10:30 AM", activity: "Back at Airbnb, unpack groceries" },
+      { time: "11:30 AM", activity: "Lunch — poke bar / Maki Sushi counter" },
+      { time: "1:00 PM", activity: "Poipu Beach / pool, easy afternoon" },
+      { time: "5:30 PM", activity: "Optional walk — Māhāʻulepu Heritage Trail" },
+      { time: "7:00 PM", activity: "Dinner — home-cooked or Keoki's Paradise" }
+    ],
     stops: [
       { name: "Poipu", lat: 21.8746, lon: -159.4657, role: "main" },
       { name: "Big Save Market", lat: 21.9048, lon: -159.4629, role: "lunch" },
@@ -331,19 +373,43 @@ const DAYS = [
   },
   {
     date: "2026-07-21", short: "Tue", label: "Jul 21",
-    title: "Open Beach / Pool Day",
-    tag: "rest", elevation: 1, loc: "poipu",
-    desc: "Snorkel postponed — a south swell has surf at High Surf Advisory levels on south-facing shores today into tomorrow. Keep it loose: pool time, or Poipu Beach Park for swimming (not snorkeling).",
-    stops: [
-      { name: "Poipu Beach Park", lat: 21.8746, lon: -159.4657, role: "main" },
-      { name: "Kukuiʻula Market", lat: 21.8849, lon: -159.4684, role: "lunch" },
-      { name: "Eating House 1849", lat: 21.8840, lon: -159.4698, role: "dinner" }
+    title: "North Shore Scouting Drive",
+    tag: "active", elevation: 2, loc: "haena",
+    desc: "Snorkel postponed today, so turned it into a scouting drive up the coast — Poipu to Kilauea to Hanalei and past, checking out the safest snorkel spots along the way. Anini Beach is the standout pick if you want to actually get in the water today.",
+    schedule: [
+      { time: "8:00 AM", activity: "Depart Poipu" },
+      { time: "9:15 AM", activity: "Lydgate Beach Park — quick stop" },
+      { time: "10:00 AM", activity: "Depart north toward Kilauea" },
+      { time: "11:00 AM", activity: "Kilauea Lighthouse (if reserved)" },
+      { time: "12:00 PM", activity: "Anini Beach — swim/snorkel + lunch" },
+      { time: "2:00 PM", activity: "Depart for Hanalei" },
+      { time: "2:30 PM", activity: "Hanalei Bay — town, pier, views" },
+      { time: "3:30 PM", activity: "Tunnels Beach" },
+      { time: "4:30 PM", activity: "Kēʻe Beach" },
+      { time: "5:30 PM", activity: "Head back toward Poipu" },
+      { time: "7:00 PM", activity: "Arrive Poipu, dinner" }
     ],
-    gear: "Swimsuits, sunscreen, hats",
-    lunch: `${mapLink("Kukuiʻula Market", "Kukuiula Market, Koloa, HI")} or ${mapLink("Living Foods Market & Cafe", "Living Foods Market and Cafe, Poipu, HI")}`,
-    dinner: `${mapLink("Eating House 1849", "Eating House 1849, Koloa, HI")} (Koloa) — reservation recommended`,
-    links: [],
-    notes: ["Snorkel attempt moved to Friday — swell should be fading by then."],
+    stops: [
+      { name: "Lydgate Beach Park", lat: 22.0372, lon: -159.3364, role: "lunch" },
+      { name: "Kilauea Lighthouse", lat: 22.2317, lon: -159.4020, role: "lunch" },
+      { name: "Anini Beach", lat: 22.2252, lon: -159.4494, role: "main" },
+      { name: "Hanalei Bay", lat: 22.2028, lon: -159.5047, role: "dinner" },
+      { name: "Tunnels Beach", lat: 22.2239, lon: -159.5611, role: "dinner" },
+      { name: "Kēʻe Beach", lat: 22.2235, lon: -159.5798, role: "dinner" }
+    ],
+    gear: "Swimsuits, snorkel gear (already rented), water shoes, reef-safe sunscreen, towels, cash for parking/snacks",
+    lunch: `${mapLink("Lydgate Beach Park", "Lydgate Beach Park, Kauai, HI")} — enclosed pools, safest snorkel water on the island, good stop on the way up`,
+    dinner: `Grab something in ${mapLink("Hanalei", "Hanalei, HI")} town, or head back toward Poipu for ${mapLink("Keoki's Paradise", "Keoki's Paradise, Poipu, HI")}`,
+    links: [
+      { label: "Kilauea Lighthouse reservations", url: "https://www.kauairefuges.org/plan-your-visit" }
+    ],
+    notes: [
+      "Route: Poipu → Lihue → Kapaʻa → Kilauea → Anini/Princeville → Hanalei → Wainiha → Hāʻena (~1.5–2 hrs one-way to the far end).",
+      "Anini Beach is the best safe snorkel stop on this drive — long fringing reef keeps it shallow and calm nearly year-round, turtles common.",
+      "Hanalei Bay is sandy-bottomed with little reef — great for the town/views, not really for snorkeling.",
+      "Tunnels and Kēʻe both have real current on their outer reefs — stay inside the reef line, especially at Kēʻe where there's a known rip on the left side.",
+      "Lydgate's enclosed rock-wall pools are the fallback if conditions look off anywhere else."
+    ],
     weather: true
   },
   {
@@ -351,6 +417,15 @@ const DAYS = [
     title: "Waimea Canyon",
     tag: "active", elevation: 2, loc: "waimea",
     desc: "\u201cGrand Canyon of the Pacific,\u201d ~1 hr drive. Scenic overlooks, short easy walks — low exertion, doubles as your pre-hike prep day. Pack hike gear tonight.",
+    schedule: [
+      { time: "8:00 AM", activity: "Depart Poipu for Waimea Canyon" },
+      { time: "9:15 AM", activity: "Waimea Canyon Lookout + short walks" },
+      { time: "12:00 PM", activity: "Lunch — Ishihara Market (Waimea town)" },
+      { time: "1:30 PM", activity: "Head back toward Poipu" },
+      { time: "3:00 PM", activity: "Free time / pool" },
+      { time: "6:00 PM", activity: "Dinner — Beach House Restaurant (book ahead)" },
+      { time: "8:30 PM", activity: "Pack all hike gear before bed" }
+    ],
     stops: [
       { name: "Waimea Canyon Lookout", lat: 22.0718, lon: -159.6616, role: "main" },
       { name: "Ishihara Market", lat: 21.9544, lon: -159.6672, role: "lunch" },
@@ -367,6 +442,18 @@ const DAYS = [
     title: "Hanakapiai Beach Hike",
     tag: "peak", elevation: 4, loc: "haena",
     desc: "Kalalau Trail to Hanakapiai Beach, 4 mi round trip. Shuttle from Waipā Park & Ride, 12:30pm departure. Normal wake-up — leave Poipu ~10:15am for the ~2 hr drive.",
+    schedule: [
+      { time: "9:00 AM", activity: "Normal wake-up, light breakfast, load gear" },
+      { time: "10:15 AM", activity: "Depart Poipu for Waipā Park & Ride" },
+      { time: "12:15 PM", activity: "Arrive Waipā, park, check in for shuttle" },
+      { time: "12:30 PM", activity: "Shuttle departs to trailhead" },
+      { time: "12:45 PM", activity: "Start hiking" },
+      { time: "2:30 PM", activity: "Arrive Hanakapiai Beach — rest, snack" },
+      { time: "3:15 PM", activity: "Begin hike back" },
+      { time: "4:45 PM", activity: "Back at trailhead, catch return shuttle" },
+      { time: "5:15 PM", activity: "Depart Waipā for Poipu" },
+      { time: "7:15 PM", activity: "Dinner — Keoki's Paradise" }
+    ],
     stops: [
       { name: "Kalalau Trailhead", lat: 22.2204, lon: -159.5826, role: "main" },
       { name: "Keoki's Paradise", lat: 21.8790, lon: -159.4598, role: "dinner" }
@@ -383,6 +470,14 @@ const DAYS = [
     title: "Recovery Day + Snorkel Retry",
     tag: "active", elevation: 2, loc: "poipu",
     desc: "Sore legs, sleep in. Best shot to retry self-guided snorkel at Lawai Beach — check conditions again that morning, since another swell was expected Thursday.",
+    schedule: [
+      { time: "9:30 AM", activity: "Sleep in, slow morning" },
+      { time: "10:30 AM", activity: "Check surf conditions, pick up gear if good — Nukumoi Surf Shop" },
+      { time: "11:00 AM", activity: "Snorkel — Lawai Beach (or Poipu Beach Park if rough)" },
+      { time: "1:00 PM", activity: "Lunch — leftovers or quick deli run" },
+      { time: "2:30 PM", activity: "Free time / rest" },
+      { time: "6:30 PM", activity: "Dinner — Bubba Burgers" }
+    ],
     stops: [
       { name: "Lawai Beach", lat: 21.8823, lon: -159.4760, role: "main" },
       { name: "Bubba Burgers", lat: 21.8830, lon: -159.4692, role: "dinner" }
@@ -398,6 +493,13 @@ const DAYS = [
     title: "Koloa Food Trucks + Turtle Watching",
     tag: "rest", elevation: 1, loc: "poipu",
     desc: "The real local Saturday night — Old Sugar Mill Park in Koloa Town for rotating food trucks, then Poipu Beach at sunset to watch honu (sea turtles) come ashore.",
+    schedule: [
+      { time: "10:00 AM", activity: "Beach / pool day, easy morning" },
+      { time: "12:30 PM", activity: "Lunch — poke/bento from Big Save or Kukuiʻula Market" },
+      { time: "5:30 PM", activity: "Old Sugar Mill Park — food trucks for dinner" },
+      { time: "7:00 PM", activity: "Walk to Poipu Beach for sunset" },
+      { time: "7:20 PM", activity: "Sunset — watch for honu coming ashore" }
+    ],
     stops: [
       { name: "Old Sugar Mill Park", lat: 21.9048, lon: -159.4658, role: "main" },
       { name: "Poipu Beach", lat: 21.8746, lon: -159.4657, role: "dinner" }
@@ -413,6 +515,15 @@ const DAYS = [
     title: "Na Pali Coast Boat Tour",
     tag: "peak", elevation: 3, loc: "portallen",
     desc: "Catamaran from Port Allen (~20 min from Poipu). Sea caves, waterfalls, wildlife, and a second snorkel stop included.",
+    schedule: [
+      { time: "6:45 AM", activity: "Depart Poipu for Port Allen" },
+      { time: "7:15 AM", activity: "Check-in at harbor (confirm exact time when booking)" },
+      { time: "7:45 AM", activity: "Boat departs" },
+      { time: "12:30 PM", activity: "Return to harbor" },
+      { time: "1:00 PM", activity: "Back in Poipu — rinse off, rest" },
+      { time: "3:00 PM", activity: "Free afternoon" },
+      { time: "6:30 PM", activity: "Dinner — Drift Kauai" }
+    ],
     stops: [
       { name: "Port Allen Small Boat Harbor", lat: 21.9015, lon: -159.5895, role: "main" },
       { name: "Drift Kauai", lat: 21.9229, lon: -159.5078, role: "dinner" }
@@ -428,6 +539,15 @@ const DAYS = [
     title: "Wailua River / Flex Day",
     tag: "active", elevation: 2, loc: "wailua",
     desc: "Optional kayak-and-hike to Secret (Uluwehi) Falls, East Side. Also your weather/reschedule buffer if anything earlier needs to move.",
+    schedule: [
+      { time: "7:00 AM", activity: "Depart Poipu for Wailua (~45 min)" },
+      { time: "8:00 AM", activity: "Kayak launch — paddle upriver" },
+      { time: "9:00 AM", activity: "Hike to Secret (Uluwehi) Falls" },
+      { time: "11:30 AM", activity: "Paddle back to launch" },
+      { time: "12:30 PM", activity: "Lunch — Bubba Burgers Kapaʻa" },
+      { time: "2:00 PM", activity: "Free afternoon / drive back to Poipu" },
+      { time: "6:30 PM", activity: "Dinner — Lava Lava Beach Club (East Side)" }
+    ],
     stops: [
       { name: "Wailua River", lat: 22.0522, lon: -159.3389, role: "main" },
       { name: "Bubba Burgers", lat: 22.0774, lon: -159.3171, role: "lunch" },
@@ -444,6 +564,13 @@ const DAYS = [
     title: "Departure",
     tag: "rest", elevation: 0, loc: "poipu",
     desc: "Last swim, pack up, fly home.",
+    schedule: [
+      { time: "7:30 AM", activity: "Last swim / breakfast at the Airbnb" },
+      { time: "9:00 AM", activity: "Pack up, load car" },
+      { time: "10:00 AM", activity: "Depart Poipu for Lihue Airport (~40 min)" },
+      { time: "10:45 AM", activity: "Return rental car" },
+      { time: "11:15 AM", activity: "Check in / security — confirm against actual flight time" }
+    ],
     stops: [
       { name: "Poipu", lat: 21.8746, lon: -159.4657, role: "main" },
       { name: "Lihue Airport", lat: 21.9788, lon: -159.3438, role: "dinner" }
@@ -635,6 +762,7 @@ DAYS.forEach((d,i)=>{
   if(d.booked) badges += `<span class="badge booked">✓ Booked</span>`;
 
   let linksHtml = d.links.map(l=>`<a href="${l.url}" target="_blank" rel="noopener">${l.label} ↗</a>`).join('<br>');
+  let areaInfoHtml = (loc.info || []).map(l=>`<a href="${l.url}" target="_blank" rel="noopener">${l.label} ↗</a>`).join('<br>');
   let notesHtml = d.notes.length ? `<ul style="margin:10px 0 0;padding-left:18px;font-size:13px;color:var(--ink-soft);line-height:1.6;">${d.notes.map(n=>`<li>${n}</li>`).join('')}</ul>` : '';
 
   const card = document.createElement('div');
@@ -658,6 +786,7 @@ DAYS.forEach((d,i)=>{
     </div>
     <p class="desc">${d.desc}</p>
     <div class="badge-row">${badges}</div>
+    ${d.schedule && d.schedule.length ? `<div class="schedule"><div class="dl">Today's Schedule</div>${d.schedule.map(s=>`<div class="sched-row"><div class="sched-time">${s.time}</div><div class="sched-activity">${s.activity}</div></div>`).join('')}</div>` : ''}
     <div id="conditionsBox-${i}">${renderConditionsLoading()}</div>
     <div class="day-map" id="map-${i}"></div>
     <div class="map-legend">
@@ -669,6 +798,7 @@ DAYS.forEach((d,i)=>{
       <div class="detail"><div class="dl">Lunch</div><div class="dv">${d.lunch}</div></div>
       <div class="detail"><div class="dl">Dinner</div><div class="dv">${d.dinner}</div></div>
       ${linksHtml ? `<div class="detail"><div class="dl">Links</div><div class="dv">${linksHtml}</div></div>` : ''}
+      ${areaInfoHtml ? `<div class="detail"><div class="dl">Area Info</div><div class="dv">${areaInfoHtml}</div></div>` : ''}
     </div>
     ${notesHtml}
   `;
