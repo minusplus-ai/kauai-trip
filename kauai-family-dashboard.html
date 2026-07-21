@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bingham Kauai Trip — Jul 19–28, 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0d2a2c;
+    --bg-deep: #0a2224;
+    --surface: #123638;
+    --paper: #f3ecdc;
+    --paper-dim: #e8dfc9;
+    --ink: #1c2b26;
+    --ink-soft: #4a5a54;
+    --ink-on-dark: #dfeae6;
+    --ink-on-dark-dim: #9db3ad;
+    --coral: #ea6a4e;
+    --coral-dim: #b74f39;
+    --teal-bright: #4fb3a3;
+    --gold: #d1a53c;
+    --line: rgba(223,234,230,0.14);
+    --line-paper: rgba(28,43,38,0.12);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background: var(--bg);
+    background-image:
+      radial-gradient(ellipse 900px 500px at 15% -10%, rgba(79,179,163,0.16), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 100% 0%, rgba(234,106,78,0.10), transparent 55%);
+    color: var(--ink-on-dark);
+    font-family: 'Inter', -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    padding: 0 0 64px 0;
+  }
+  .wrap{ max-width: 980px; margin: 0 auto; padding: 40px 24px 0; }
+  a{ color: var(--teal-bright); }
+
+  /* ---------- Hero ---------- */
+  .eyebrow{
+    font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--ink-on-dark-dim); font-weight: 600; margin-bottom: 10px;
+  }
+  h1{
+    font-family: 'Fraunces', serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-size: clamp(32px, 5.5vw, 52px);
+    line-height: 1.02;
+    margin: 0 0 8px 0;
+    color: #fff;
+    letter-spacing: -0.01em;
+  }
+  .subtitle{ color: var(--ink-on-dark-dim); font-size: 15px; margin: 0 0 30px 0; max-width: 520px; }
+  .who-row{ display:flex; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
+  .who-pill{
+    font-size: 13px; padding: 5px 12px; border-radius: 100px;
+    border: 1px solid var(--line); color: var(--ink-on-dark);
+    font-weight: 500;
+  }
+
+  /* ---------- Stat strip ---------- */
+  .stats{
+    display:grid; grid-template-columns: repeat(4,1fr); gap: 1px;
+    background: var(--line); border: 1px solid var(--line); border-radius: 14px;
+    overflow: hidden; margin: 28px 0 8px;
+  }
+  .stat{ background: var(--bg-deep); padding: 16px 14px; }
+  .stat .n{ font-family:'Fraunces',serif; font-weight:600; font-size: 24px; color:#fff; line-height:1; }
+  .stat .l{ font-size: 11px; color: var(--ink-on-dark-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 6px; }
+  @media (max-width: 640px){ .stats{ grid-template-columns: repeat(2,1fr); } }
+
+  /* ---------- Trail elevation timeline (signature element) ---------- */
+  .trail-section{ margin: 40px 0 10px; }
+  .trail-label{
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--ink-on-dark-dim); margin-bottom: 14px; display:flex; align-items:center; gap:8px;
+  }
+  .trail-label::after{ content:''; flex:1; height:1px; background: var(--line); }
+  .trail{ position: relative; height: 168px; margin: 0 0 6px; }
+  .trail svg{ position:absolute; inset:0; width:100%; height:100%; overflow: visible; }
+  .trail-pt{
+    position:absolute; transform: translate(-50%, 50%);
+    width: 13px; height: 13px; border-radius: 50%;
+    background: var(--surface); border: 2px solid var(--teal-bright);
+    cursor: pointer; transition: transform .15s ease;
+  }
+  .trail-pt:hover{ transform: translate(-50%, 50%) scale(1.3); }
+  .trail-pt.is-today{ background: var(--coral); border-color: var(--coral); box-shadow: 0 0 0 5px rgba(234,106,78,0.22); }
+  .trail-pt.is-peak{ border-color: var(--coral); }
+  .trail-pt.is-past{ opacity: 0.45; }
+  .flag{
+    position:absolute; bottom: calc(100% + 6px); left:50%; transform: translateX(-50%);
+    font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    background: var(--coral); color:#fff; padding: 3px 8px; border-radius: 5px; white-space: nowrap;
+  }
+  .flag::after{
+    content:''; position:absolute; top:100%; left:50%; transform: translateX(-50%);
+    border: 4px solid transparent; border-top-color: var(--coral);
+  }
+  .trail-days{ display:flex; justify-content: space-between; margin-top: 4px; }
+  .trail-day{ flex:1; text-align:center; font-size: 10.5px; color: var(--ink-on-dark-dim); }
+  .trail-day b{ display:block; color: var(--ink-on-dark); font-size: 12.5px; font-weight:600; margin-top:1px; }
+
+  /* ---------- Today spotlight ---------- */
+  .today-card{
+    background: var(--paper); color: var(--ink); border-radius: 18px;
+    padding: 26px 26px 22px; margin: 30px 0; position: relative;
+    box-shadow: 0 20px 50px -20px rgba(0,0,0,0.5);
+  }
+  .today-card .kicker{
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700;
+    color: var(--coral-dim); margin-bottom: 6px;
+  }
+  .today-card h2{
+    font-family:'Fraunces',serif; font-weight: 600; font-size: 25px; margin: 0 0 10px;
+  }
+  .today-card p.desc{ margin: 0 0 16px; color: var(--ink-soft); font-size: 14.5px; line-height:1.55; }
+  .badge-row{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom: 16px; }
+  .badge{
+    font-size: 11.5px; font-weight: 600; padding: 4px 10px; border-radius: 100px;
+    display:inline-flex; align-items:center; gap:5px;
+  }
+  .badge.budget{ background: rgba(209,165,60,0.18); color: #8a6a1e; }
+  .badge.weather{ background: rgba(79,179,163,0.18); color: #1d6e60; }
+  .badge.booked{ background: rgba(28,43,38,0.08); color: var(--ink); }
+  .detail-grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 14px; }
+  @media (max-width: 560px){ .detail-grid{ grid-template-columns: 1fr; } }
+  .detail{ border-top: 1px solid var(--line-paper); padding-top: 10px; }
+  .detail .dl{ font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--coral-dim); font-weight: 700; margin-bottom: 5px; }
+  .detail .dv{ font-size: 13.5px; line-height: 1.5; }
+  .detail .dv a{ color: var(--ink); font-weight: 600; text-decoration: underline; text-decoration-color: var(--coral); text-underline-offset: 2px; }
+
+  /* ---------- Day grid ---------- */
+  .grid-label{ font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-on-dark-dim); margin: 34px 0 14px; }
+  .day-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  @media (max-width: 760px){ .day-grid{ grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 480px){ .day-grid{ grid-template-columns: 1fr; } }
+
+  .day-card{
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+    padding: 16px; cursor: pointer; transition: border-color .15s ease, transform .15s ease;
+  }
+  .day-card:hover{ border-color: var(--teal-bright); transform: translateY(-2px); }
+  .day-card.active{ border-color: var(--coral); background: rgba(234,106,78,0.08); }
+  .day-card .dc-date{ font-size: 11px; color: var(--ink-on-dark-dim); text-transform: uppercase; letter-spacing:0.06em; margin-bottom: 4px; }
+  .day-card .dc-title{ font-family:'Fraunces',serif; font-weight: 600; font-size: 15.5px; color:#fff; line-height:1.25; margin-bottom: 8px; min-height: 38px; }
+  .dc-tag{ display:inline-block; font-size: 10.5px; font-weight: 700; padding: 3px 8px; border-radius: 100px; }
+  .tag-rest{ background: rgba(79,179,163,0.18); color: var(--teal-bright); }
+  .tag-active{ background: rgba(209,165,60,0.18); color: var(--gold); }
+  .tag-peak{ background: rgba(234,106,78,0.2); color: var(--coral); }
+
+  /* ---------- Footer checklist ---------- */
+  .footer{
+    margin-top: 46px; border-top: 1px solid var(--line); padding-top: 26px;
+    display:grid; grid-template-columns: 1.3fr 1fr; gap: 30px;
+  }
+  @media (max-width: 680px){ .footer{ grid-template-columns: 1fr; } }
+  .footer h3{ font-family:'Fraunces',serif; font-size: 16px; font-weight:600; color:#fff; margin: 0 0 12px; }
+  .check-item{ display:flex; align-items:flex-start; gap: 10px; font-size: 13.5px; padding: 7px 0; border-bottom: 1px solid var(--line); color: var(--ink-on-dark); }
+  .check-item:last-child{ border-bottom:none; }
+  .check-item .box{ width:16px; height:16px; border-radius:5px; border:1.5px solid var(--teal-bright); flex-shrink:0; margin-top:1px; }
+  .check-item .box.done{ background: var(--teal-bright); position:relative; }
+  .check-item .box.done::after{ content:'✓'; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:11px; color: var(--bg-deep); font-weight:900; }
+  .savings-line{ display:flex; justify-content:space-between; font-size: 13.5px; padding: 7px 0; border-bottom: 1px solid var(--line); }
+  .savings-line:last-child{ border-bottom: none; font-weight: 700; color: #fff; padding-top: 12px; }
+  .savings-line span:last-child{ color: var(--gold); font-weight: 600; }
+
+  .legend{ display:flex; gap:16px; flex-wrap:wrap; font-size:11.5px; color: var(--ink-on-dark-dim); margin-top: 10px; }
+  .legend span{ display:inline-flex; align-items:center; gap:5px; }
+  .legend i{ width:9px; height:9px; border-radius:50%; display:inline-block; }
+
+  /* ---------- Location icon + conditions ---------- */
+  .loc-row{ display:flex; align-items:center; gap:12px; margin-bottom:14px; }
+  .loc-icon{
+    width:56px; height:56px; border-radius:12px; flex-shrink:0;
+    background: rgba(28,43,38,0.06); display:flex; align-items:center; justify-content:center;
+  }
+  .loc-icon svg{ width:32px; height:32px; }
+  .loc-name{ font-size:12px; text-transform:uppercase; letter-spacing:0.06em; color: var(--ink-soft); font-weight:700; }
+  .conditions{
+    display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0 4px;
+    background: rgba(28,43,38,0.05); border-radius: 12px; padding: 14px;
+  }
+  @media (max-width:560px){ .conditions{ grid-template-columns: 1fr; } }
+  .cond-block .dl{ font-size:10.5px; text-transform:uppercase; letter-spacing:0.08em; color: var(--coral-dim); font-weight:700; margin-bottom:6px; }
+  .cond-block .cv{ font-size: 13.5px; line-height:1.5; }
+  .cond-block .cv .muted{ color: var(--ink-soft); font-size:12px; }
+  .tide-chip{ display:inline-block; font-size:12px; padding:2px 8px; border-radius:100px; background: rgba(79,179,163,0.16); color:#1d6e60; margin: 2px 4px 2px 0; font-weight:600; }
+  .tide-chip.low{ background: rgba(234,106,78,0.14); color: var(--coral-dim); }
+  .mini-loc{ display:flex; align-items:center; gap:6px; margin-top:8px; }
+  .mini-loc svg{ width:16px; height:16px; opacity:0.8; }
+  .mini-loc span{ font-size:11px; color: var(--ink-on-dark-dim); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">Bingham Family · Kauaʻi 2026</div>
+  <h1>South Shore &amp; the<br>Nā Pali Coast</h1>
+  <p class="subtitle">A shared field guide for the whole crew — where we're staying, what's booked, what to eat, and what to pack, day by day.</p>
+  <div class="who-row">
+    <span class="who-pill">Tyler · 49</span>
+    <span class="who-pill">Alyson · 48</span>
+    <span class="who-pill">Son · 18</span>
+    <span class="who-pill">Son · 12</span>
+    <span class="who-pill">📍 Poipu Airbnb</span>
+  </div>
+
+  <div class="stats" id="statStrip"></div>
+
+  <div class="trail-section">
+    <div class="trail-label">The trip, as a trail — bigger day, higher peak</div>
+    <div class="trail" id="trail"></div>
+    <div class="trail-days" id="trailDays"></div>
+    <div class="legend">
+      <span><i style="background:var(--coral)"></i> Today</span>
+      <span><i style="background:var(--teal-bright)"></i> Upcoming</span>
+      <span><i style="background:#3a5350;opacity:.6"></i> Done</span>
+    </div>
+  </div>
+
+  <div class="today-card" id="todayCard"></div>
+
+  <div class="grid-label">Full itinerary — tap any day</div>
+  <div class="day-grid" id="dayGrid"></div>
+
+  <div class="footer">
+    <div>
+      <h3>Booking checklist</h3>
+      <div id="checklist"></div>
+    </div>
+    <div>
+      <h3>Budget swaps so far</h3>
+      <div id="savings"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const LOCATIONS = {
+  poipu:  { name: "Poipu",         lat: 21.8746, lon: -159.4657, icon: "beach" },
+  waimea: { name: "Kōkeʻe / Waimea Canyon", lat: 22.1333, lon: -159.6500, icon: "canyon" },
+  haena:  { name: "Hāʻena / Nā Pali trailhead", lat: 22.2202, lon: -159.5738, icon: "trail" },
+  portallen: { name: "Port Allen", lat: 21.9036, lon: -159.5917, icon: "boat" },
+  wailua: { name: "Wailua",        lat: 22.0522, lon: -159.3389, icon: "river" }
+};
+
+const ICONS = {
+  beach: `<svg viewBox="0 0 48 48" fill="none" stroke="#1c2b26" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 34c4-3 8-3 12 0s8 3 12 0 8-3 12 0 8-3 8-3"/><path d="M24 26V8"/><path d="M24 10c6 0 10 4 10 4s-6 3-10 3-10-3-10-3 4-4 10-4z" fill="#1c2b26" fill-opacity="0.06"/><circle cx="36" cy="12" r="4"/></svg>`,
+  canyon: `<svg viewBox="0 0 48 48" fill="none" stroke="#1c2b26" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 36 12 16l6 10 6-16 8 14 4-6 10 18"/><path d="M2 36h44" /></svg>`,
+  trail: `<svg viewBox="0 0 48 48" fill="none" stroke="#1c2b26" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 40C14 30 10 22 16 18s10 6 16-2 10-8 10-8"/><circle cx="10" cy="10" r="3"/><path d="M20 40c2-6 4-9 8-9s5 4 8 3"/></svg>`,
+  boat: `<svg viewBox="0 0 48 48" fill="none" stroke="#1c2b26" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 28h36l-4 10H10z"/><path d="M24 28V8"/><path d="M24 8c6 1 9 6 9 10h-9z" fill="#1c2b26" fill-opacity="0.06"/><path d="M2 40c3-2 6-2 9 0s6 2 9 0 6-2 9 0 6-2 9 0 6-2 8-1"/></svg>`,
+  river: `<svg viewBox="0 0 48 48" fill="none" stroke="#1c2b26" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14c6 0 6 6 12 6s6-6 12-6 6 6 12 6 6-6 4-6"/><path d="M4 26c6 0 6 6 12 6s6-6 12-6 6 6 12 6 6-6 4-6"/><path d="M4 38c6 0 6 6 12 6s6-6 12-6 6 6 12 6 6-6 4-6"/></svg>`
+};
+
+const DAYS = [
+  {
+    date: "2026-07-19", short: "Sun", label: "Jul 19",
+    title: "Arrival (evening)",
+    tag: "rest", elevation: 0, loc: "poipu",
+    desc: "Land at 6:58pm — by the time you clear the airport and drive to Poipu (~30–40 min), it's after 8pm. Tonight is landing only.",
+    gear: "Travel clothes, chargers, meds in carry-on, cash for tipping",
+    lunch: "—",
+    dinner: "Living Foods Market & Cafe (Kukuiʻula) — deli counter, no reservation needed",
+    links: [],
+    notes: ["Light grocery run at Kukuiʻula Market for tonight + tomorrow AM only — save the full stock-up for Monday."]
+  },
+  {
+    date: "2026-07-20", short: "Mon", label: "Jul 20",
+    title: "Grocery Stock-Up + Ease In",
+    tag: "rest", elevation: 1, loc: "poipu",
+    desc: "Full grocery run at Big Save Koloa, then beach/pool to shake off travel. Optional easy evening walk on the Māhāʻulepu Heritage Trail.",
+    gear: "Swimsuits, reef-safe sunscreen, towels, water shoes, cooler bags",
+    lunch: "Big Save poke bar or Kukuiʻula Market's Maki Sushi counter",
+    dinner: "Home-cooked with tonight's groceries — or Keoki's Paradise if eating out",
+    links: [],
+    notes: ["Big Save Koloa, 5516 Koloa Rd — produce, meat, seafood, poke bar, bakery.", "Costco (Lihue) for bulk items if you want it — easiest on the drive in from the airport."]
+  },
+  {
+    date: "2026-07-21", short: "Tue", label: "Jul 21",
+    title: "Open Beach / Pool Day",
+    tag: "rest", elevation: 1, loc: "poipu",
+    desc: "Snorkel postponed — a south swell has surf at High Surf Advisory levels on south-facing shores today into tomorrow. Keep it loose: pool time, or Poipu Beach Park for swimming (not snorkeling).",
+    gear: "Swimsuits, sunscreen, hats",
+    lunch: "Kukuiʻula Market or Living Foods Market & Cafe",
+    dinner: "Eating House 1849 (Koloa) — reservation recommended",
+    links: [],
+    notes: ["Snorkel attempt moved to Friday — swell should be fading by then."],
+    weather: true
+  },
+  {
+    date: "2026-07-22", short: "Wed", label: "Jul 22",
+    title: "Waimea Canyon",
+    tag: "active", elevation: 2, loc: "waimea",
+    desc: "\u201cGrand Canyon of the Pacific,\u201d ~1 hr drive. Scenic overlooks, short easy walks — low exertion, doubles as your pre-hike prep day. Pack hike gear tonight.",
+    gear: "Light layer (cooler at elevation), sneakers, sunscreen, hat, water, snacks",
+    lunch: "Ishihara Market (Waimea town) bentos/poke — verify still open; backups: Wrangler's Steakhouse, Shrimp Station",
+    dinner: "Beach House Restaurant — sunset on the water, book ahead",
+    links: [{label:"Park info", url:"https://dlnr.hawaii.gov/dsp/parks/kauai/waimea-canyon-state-park/"}],
+    notes: ["No early wake-up needed tomorrow — the shuttle isn't until 12:30pm."]
+  },
+  {
+    date: "2026-07-23", short: "Thu", label: "Jul 23",
+    title: "Hanakapiai Beach Hike",
+    tag: "peak", elevation: 4, loc: "haena",
+    desc: "Kalalau Trail to Hanakapiai Beach, 4 mi round trip. Shuttle from Waipā Park & Ride, 12:30pm departure. Normal wake-up — leave Poipu ~10:15am for the ~2 hr drive.",
+    gear: "Real-traction hiking shoes, 2–3L water/person, trail snacks, sunscreen, rain layer, dry bag, first aid, spare socks, cash/ID for shuttle",
+    lunch: "Grab-and-go from Big Save/Kukuiʻula before heading out",
+    dinner: "Keoki's Paradise — casual, open till 10pm, forgiving of a later arrival",
+    links: [{label:"Shuttle reservation (booked)", url:"https://gohaena.com/"}],
+    notes: ["✅ Reserved: Jul 23, 12:30pm shuttle."],
+    booked: true
+  },
+  {
+    date: "2026-07-24", short: "Fri", label: "Jul 24",
+    title: "Recovery Day + Snorkel Retry",
+    tag: "active", elevation: 2, loc: "poipu",
+    desc: "Sore legs, sleep in. Best shot to retry self-guided snorkel at Lawai Beach — check conditions again that morning, since another swell was expected Thursday.",
+    gear: "Rented mask/snorkel/fins, rash guard, sunscreen, water shoes, dry bag",
+    lunch: "Leftovers or a quick deli run",
+    dinner: "Bubba Burgers (Shops at Kukuiʻula) — casual comfort food",
+    links: [],
+    notes: ["Gear rental: Nukumoi Surf Shop, ~$25/person for the week (alt: Seasport Divers, Boss Frog's).", "Budget swap saved ~$400 vs. the guided tour."],
+    budget: true
+  },
+  {
+    date: "2026-07-25", short: "Sat", label: "Jul 25",
+    title: "Koloa Food Trucks + Turtle Watching",
+    tag: "rest", elevation: 1, loc: "poipu",
+    desc: "The real local Saturday night — Old Sugar Mill Park in Koloa Town for rotating food trucks, then Poipu Beach at sunset to watch honu (sea turtles) come ashore.",
+    gear: "Cash for food trucks, light evening layer, camera (no flash near turtles)",
+    lunch: "Poke/bento from Big Save or Kukuiʻula Market for the beach",
+    dinner: "Old Sugar Mill Park food trucks — Kickshaws and rotating local vendors",
+    links: [],
+    notes: ["Swapped the resort luau for this — no booking needed, just show up.", "Keeps the night genuinely local instead of a tourist production."],
+    budget: true
+  },
+  {
+    date: "2026-07-26", short: "Sun", label: "Jul 26",
+    title: "Na Pali Coast Boat Tour",
+    tag: "peak", elevation: 3, loc: "portallen",
+    desc: "Catamaran from Port Allen (~20 min from Poipu). Sea caves, waterfalls, wildlife, and a second snorkel stop included.",
+    gear: "Swimsuit, motion-sickness meds if needed, sunscreen, hat w/ strap, windbreaker, dry bag",
+    lunch: "Usually included on board — confirm when booking",
+    dinner: "Drift Kauai (Kalaheo) — casual, good cocktails and bar food",
+    links: [{label:"Book tour", url:"https://www.napali.com/"}],
+    notes: ["Priciest outing left on the trip — a cheaper raft operator (~$169/person) is worth a look if budget's tight."]
+  },
+  {
+    date: "2026-07-27", short: "Mon", label: "Jul 27",
+    title: "Wailua River / Flex Day",
+    tag: "active", elevation: 2, loc: "wailua",
+    desc: "Optional kayak-and-hike to Secret (Uluwehi) Falls, East Side. Also your weather/reschedule buffer if anything earlier needs to move.",
+    gear: "Swimsuit, water shoes, dry bag, sunscreen, change of clothes",
+    lunch: "Bubba Burgers Kapaa if going self-guided (guided tours often include lunch)",
+    dinner: "Lava Lava Beach Club (Wailua) — feet-in-the-sand casual",
+    links: [],
+    notes: ["Self-rental kayak (~$50–70/double) instead of a guided tour saves roughly $450 for the family."],
+    budget: true
+  },
+  {
+    date: "2026-07-28", short: "Tue", label: "Jul 28",
+    title: "Departure",
+    tag: "rest", elevation: 0, loc: "poipu",
+    desc: "Last swim, pack up, fly home.",
+    gear: "Boarding passes, wet gear in a separate bag, buffer time to Lihue airport",
+    lunch: "Light breakfast at the Airbnb; grab-and-go near Lihue if needed",
+    dinner: "—",
+    links: [],
+    notes: []
+  }
+];
+
+const CHECKLIST = [
+  { label: "Hāʻena State Park shuttle — Jul 23, 12:30pm", done: true },
+  { label: "Self-guided snorkel gear rental — Fri Jul 24", done: false },
+  { label: "Na Pali boat tour + snorkel — Jul 26", done: false }
+];
+
+const SAVINGS = [
+  { label: "Guided snorkel → self-guided", value: "~$400" },
+  { label: "Resort luau → local food trucks", value: "~$180" },
+  { label: "Guided kayak → self-rental", value: "~$450" }
+];
+
+function toDate(s){ const [y,m,d]=s.split('-').map(Number); return new Date(y, m-1, d); }
+function sameDay(a,b){ return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate(); }
+
+const today = new Date();
+let todayIdx = DAYS.findIndex(d => sameDay(toDate(d.date), today));
+let statusLabel = "";
+if(todayIdx === -1){
+  if(today < toDate(DAYS[0].date)){
+    todayIdx = 0;
+    const diff = Math.ceil((toDate(DAYS[0].date) - today) / 86400000);
+    statusLabel = diff + " day" + (diff===1?"":"s") + " until departure";
+  } else {
+    todayIdx = DAYS.length - 1;
+    statusLabel = "Trip complete — welcome home!";
+  }
+}
+
+// ---- Stat strip ----
+const bookedCount = CHECKLIST.filter(c=>c.done).length;
+const totalSavings = "~$1,030";
+document.getElementById('statStrip').innerHTML = `
+  <div class="stat"><div class="n">${DAYS.length}</div><div class="l">Days on island</div></div>
+  <div class="stat"><div class="n">${bookedCount}/${CHECKLIST.length}</div><div class="l">Booked</div></div>
+  <div class="stat"><div class="n">${totalSavings}</div><div class="l">Saved on tours</div></div>
+  <div class="stat"><div class="n">1</div><div class="l">Hike, one shot</div></div>
+`;
+
+// ---- Trail elevation (signature element) ----
+const trailEl = document.getElementById('trail');
+const trailDaysEl = document.getElementById('trailDays');
+const n = DAYS.length;
+const padX = 4, topPad = 18, botPad = 30;
+function xFor(i){ return padX + (i/(n-1))*(100-2*padX); }
+function yFor(elev){ const h = 100; return topPad + (1 - elev/4) * (h - topPad - botPad); }
+
+let points = DAYS.map((d,i)=>`${xFor(i)},${yFor(d.elevation)}`).join(' ');
+let svg = `<svg viewBox="0 0 100 100" preserveAspectRatio="none">
+  <polyline points="${points}" fill="none" stroke="var(--teal-bright)" stroke-width="0.6" stroke-linecap="round" stroke-linejoin="round" opacity="0.7" vector-effect="non-scaling-stroke"/>
+</svg>`;
+trailEl.innerHTML = svg;
+
+DAYS.forEach((d,i)=>{
+  const dot = document.createElement('div');
+  dot.className = 'trail-pt' + (d.elevation>=4?' is-peak':'') + (i===todayIdx?' is-today':'') + (i<todayIdx?' is-past':'');
+  dot.style.left = xFor(i)+'%';
+  dot.style.bottom = ((1 - (1 - d.elevation/4))*0 + (100 - yFor(d.elevation)))+'%'; // placeholder, corrected below
+  dot.style.bottom = (100 - yFor(d.elevation)) + '%';
+  dot.title = d.title;
+  dot.onclick = ()=>selectDay(i);
+  if(i===todayIdx){
+    const flag = document.createElement('div');
+    flag.className='flag';
+    flag.textContent = statusLabel || "Today";
+    dot.appendChild(flag);
+  }
+  trailEl.appendChild(dot);
+});
+
+DAYS.forEach(d=>{
+  const el = document.createElement('div');
+  el.className='trail-day';
+  el.innerHTML = `${d.short}<b>${d.label.split(' ')[1]}</b>`;
+  trailDaysEl.appendChild(el);
+});
+
+// ---- Day grid ----
+const gridEl = document.getElementById('dayGrid');
+DAYS.forEach((d,i)=>{
+  const card = document.createElement('div');
+  card.className = 'day-card' + (i===todayIdx?' active':'');
+  card.onclick = ()=>selectDay(i);
+  const tagClass = d.tag==='peak' ? 'tag-peak' : (d.tag==='active' ? 'tag-active' : 'tag-rest');
+  const tagLabel = d.tag==='peak' ? 'Big day' : (d.tag==='active' ? 'Active' : 'Easy');
+  const loc = LOCATIONS[d.loc];
+  card.innerHTML = `
+    <div class="dc-date">${d.short}, ${d.label}</div>
+    <div class="dc-title">${d.title}</div>
+    <span class="dc-tag ${tagClass}">${tagLabel}</span>
+    <div class="mini-loc">${ICONS[loc.icon]}<span>${loc.name}</span></div>
+  `;
+  card.dataset.idx = i;
+  gridEl.appendChild(card);
+});
+
+// ---- Live weather (NWS, no key needed) ----
+const weatherCache = {};
+async function getForecastForLocation(locKey){
+  if(weatherCache[locKey]) return weatherCache[locKey];
+  const {lat, lon} = LOCATIONS[locKey];
+  const p = (async () => {
+    const pointRes = await fetch(`https://api.weather.gov/points/${lat},${lon}`);
+    if(!pointRes.ok) throw new Error('points fetch failed');
+    const pointData = await pointRes.json();
+    const forecastUrl = pointData.properties.forecast;
+    const fRes = await fetch(forecastUrl);
+    if(!fRes.ok) throw new Error('forecast fetch failed');
+    const fData = await fRes.json();
+    const byDate = {};
+    fData.properties.periods.forEach(period => {
+      const dateStr = period.startTime.slice(0,10);
+      if(period.isDaytime || !byDate[dateStr]){
+        byDate[dateStr] = period;
+      }
+    });
+    return byDate;
+  })();
+  weatherCache[locKey] = p;
+  return p;
+}
+
+// ---- Live tides (NOAA CO-OPS, nearest station: Nawiliwili) ----
+let tideCache = null;
+async function getTideMap(){
+  if(tideCache) return tideCache;
+  const begin = DAYS[0].date.replace(/-/g,'');
+  const end = DAYS[DAYS.length-1].date.replace(/-/g,'');
+  const url = `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=predictions&application=kauai_dashboard&begin_date=${begin}&end_date=${end}&datum=MLLW&station=1611400&time_zone=lst_ldt&units=english&interval=hilo&format=json`;
+  tideCache = (async () => {
+    const res = await fetch(url);
+    if(!res.ok) throw new Error('tide fetch failed');
+    const data = await res.json();
+    const byDate = {};
+    (data.predictions || []).forEach(pr => {
+      const dateStr = pr.t.slice(0,10);
+      if(!byDate[dateStr]) byDate[dateStr] = [];
+      byDate[dateStr].push({ time: pr.t.slice(11,16), type: pr.type, height: parseFloat(pr.v).toFixed(1) });
+    });
+    return byDate;
+  })();
+  return tideCache;
+}
+
+function renderConditionsLoading(){
+  return `<div class="conditions">
+    <div class="cond-block"><div class="dl">Weather</div><div class="cv muted">Loading live forecast…</div></div>
+    <div class="cond-block"><div class="dl">Tides (Nawiliwili)</div><div class="cv muted">Loading tide predictions…</div></div>
+  </div>`;
+}
+
+async function renderConditions(i, requestToken){
+  const d = DAYS[i];
+  const el = document.getElementById('conditionsBox');
+  try{
+    const [forecastMap, tideMap] = await Promise.all([getForecastForLocation(d.loc), getTideMap()]);
+    if(el.dataset.token != requestToken) return; // a newer selection has since happened
+    const fc = forecastMap[d.date];
+    const tides = tideMap[d.date] || [];
+    const weatherHtml = fc
+      ? `<div class="cv"><b>${fc.temperature}°${fc.temperatureUnit}</b> — ${fc.shortForecast}<br><span class="muted">Wind ${fc.windSpeed} ${fc.windDirection}</span></div>`
+      : `<div class="cv muted">No live forecast yet for this date — NWS only publishes ~7 days out. Check back closer to the day.</div>`;
+    const tideHtml = tides.length
+      ? tides.map(t => `<span class="tide-chip ${t.type==='L'?'low':''}">${t.type==='H'?'High':'Low'} ${t.time} · ${t.height}ft</span>`).join('')
+      : `<div class="cv muted">Tide data unavailable</div>`;
+    el.innerHTML = `
+      <div class="cond-block"><div class="dl">Weather · ${LOCATIONS[d.loc].name}</div>${weatherHtml}</div>
+      <div class="cond-block"><div class="dl">Tides · nearest station (Nawiliwili)</div><div class="cv">${tideHtml}</div></div>
+    `;
+  } catch(e){
+    if(el.dataset.token != requestToken) return;
+    el.innerHTML = `<div class="cond-block"><div class="dl">Weather &amp; Tides</div><div class="cv muted">Live data unavailable right now (offline or blocked request). Try reloading, or check weather.gov / tidesandcurrents.noaa.gov directly.</div></div>`;
+  }
+}
+
+let conditionsToken = 0;
+
+function selectDay(i){
+  const d = DAYS[i];
+  document.querySelectorAll('.trail-pt').forEach((el,idx)=>{
+    el.style.boxShadow = idx===i ? '0 0 0 5px rgba(79,179,163,0.28)' : '';
+  });
+  document.querySelectorAll('.day-card').forEach((el)=> el.classList.toggle('active', Number(el.dataset.idx)===i));
+
+  let badges = '';
+  if(d.budget) badges += `<span class="badge budget">💰 Budget swap</span>`;
+  if(d.weather) badges += `<span class="badge weather">🌊 Weather-dependent</span>`;
+  if(d.booked) badges += `<span class="badge booked">✓ Booked</span>`;
+
+  let linksHtml = d.links.map(l=>`<a href="${l.url}" target="_blank" rel="noopener">${l.label} ↗</a>`).join('<br>');
+  let notesHtml = d.notes.length ? `<ul style="margin:10px 0 0;padding-left:18px;font-size:13px;color:var(--ink-soft);line-height:1.6;">${d.notes.map(n=>`<li>${n}</li>`).join('')}</ul>` : '';
+  const loc = LOCATIONS[d.loc];
+
+  conditionsToken++;
+  const myToken = conditionsToken;
+
+  document.getElementById('todayCard').innerHTML = `
+    <div class="kicker">${i===todayIdx ? (statusLabel || 'Today') : (d.short + ', ' + d.label)}</div>
+    <div class="loc-row">
+      <div class="loc-icon">${ICONS[loc.icon]}</div>
+      <div><h2 style="margin:0;">${d.title}</h2><div class="loc-name">${loc.name}</div></div>
+    </div>
+    <p class="desc">${d.desc}</p>
+    <div class="badge-row">${badges}</div>
+    <div id="conditionsBox" data-token="${myToken}">${renderConditionsLoading()}</div>
+    <div class="detail-grid">
+      <div class="detail"><div class="dl">Gear</div><div class="dv">${d.gear}</div></div>
+      <div class="detail"><div class="dl">Lunch</div><div class="dv">${d.lunch}</div></div>
+      <div class="detail"><div class="dl">Dinner</div><div class="dv">${d.dinner}</div></div>
+      ${linksHtml ? `<div class="detail"><div class="dl">Links</div><div class="dv">${linksHtml}</div></div>` : ''}
+    </div>
+    ${notesHtml}
+  `;
+  document.getElementById('conditionsBox').dataset.token = myToken;
+  renderConditions(i, myToken);
+}
+
+// ---- Checklist & savings ----
+document.getElementById('checklist').innerHTML = CHECKLIST.map(c=>`
+  <div class="check-item"><div class="box ${c.done?'done':''}"></div><div>${c.label}</div></div>
+`).join('');
+
+document.getElementById('savings').innerHTML = SAVINGS.map(s=>`
+  <div class="savings-line"><span>${s.label}</span><span>${s.value}</span></div>
+`).join('') + `<div class="savings-line"><span>Total saved</span><span>${totalSavings}</span></div>`;
+
+selectDay(todayIdx);
+</script>
+</body>
+</html>
