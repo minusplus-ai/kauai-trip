@@ -241,9 +241,9 @@
   .safety-pill.low{ background: var(--safe-green); }
   .safety-pill.caution{ background: var(--gold); color:#3a2c05; }
   .safety-pill.high{ background: var(--safe-red); }
-  .safety-name{ color: var(--ink-on-dark); }
-  .safety-link{ font-size:11.5px; color: var(--teal-bright); margin-left:auto; white-space:nowrap; }
-  .safety-disclaimer{ font-size:11px; color: var(--ink-on-dark-dim); margin-top:8px; line-height:1.5; }
+  .safety-name{ color: var(--ink); font-weight: 600; }
+  .safety-link{ font-size:11.5px; color: var(--coral-dim); margin-left:auto; white-space:nowrap; font-weight:600; text-decoration: underline; text-decoration-color: var(--coral); text-underline-offset: 2px; }
+  .safety-disclaimer{ font-size:11px; color: var(--ink-soft); margin-top:8px; line-height:1.5; }
   .loc-name{ font-size:12px; text-transform:uppercase; letter-spacing:0.06em; color: var(--ink-soft); font-weight:700; }
   .conditions{
     display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0 4px;
@@ -418,7 +418,8 @@ const DAYS = [
       { name: "Kilauea Lighthouse", lat: 22.2317, lon: -159.4020, role: "lunch" },
       { name: "Anini Beach", lat: 22.2252, lon: -159.4494, role: "main", safety: { level: "low", label: "Normal Conditions", url: "https://safebeachday.com/county/kauai/" } },
       { name: "Hanalei Bay", lat: 22.2028, lon: -159.5047, role: "dinner", safety: { level: "low", label: "Normal Conditions", url: "https://safebeachday.com/hanalei/" } },
-      { name: "Tunnels Beach", lat: 22.2239, lon: -159.5611, role: "dinner", safety: { level: "caution", label: "Caution", url: "https://safebeachday.com/ha-ena/" } },
+      { name: "Tunnels Beach", lat: 22.2239, lon: -159.5611, role: "dinner", safety: { level: "caution", label: "Caution", url: "https://safebeachday.com/county/kauai/" } },
+      { name: "Haʻena Beach Park", lat: 22.2199, lon: -159.5662, role: "dinner", safety: { level: "high", label: "High Hazard — unprotected, drowning history", url: "https://safebeachday.com/ha-ena/" } },
       { name: "Kēʻe Beach", lat: 22.2235, lon: -159.5798, role: "dinner", safety: { level: "caution", label: "Caution", url: "https://safebeachday.com/kee/" } }
     ],
     gear: "Swimsuits, snorkel gear (already rented), water shoes, reef-safe sunscreen, towels, cash for parking/snacks",
@@ -432,6 +433,7 @@ const DAYS = [
       "Anini Beach is the best safe snorkel stop on this drive — long fringing reef keeps it shallow and calm nearly year-round, turtles common.",
       "Hanalei Bay is sandy-bottomed with little reef — great for the town/views, not really for snorkeling.",
       "Tunnels and Kēʻe both have real current on their outer reefs — stay inside the reef line, especially at Kēʻe where there's a known rip on the left side.",
+      "Haʻena Beach Park (right across from Tunnels, where the trail to Tunnels starts) is a different, more exposed beach — no reef protects it from open ocean, and it has a documented history of drownings. Fine to look at, not to swim at — confirmed via safebeachday.com's own beach profile.",
       "Lydgate's enclosed rock-wall pools are the fallback if conditions look off anywhere else."
     ],
     weather: true
@@ -480,7 +482,7 @@ const DAYS = [
     ],
     stops: [
       { name: "Kalalau Trailhead", lat: 22.2204, lon: -159.5826, role: "main" },
-      { name: "Hanakapiai Beach", lat: 22.2103, lon: -159.6069, role: "lunch", safety: { level: "high", label: "High Hazard — no swimming", url: "https://safebeachday.com/ha-ena/" } },
+      { name: "Hanakapiai Beach", lat: 22.2103, lon: -159.6069, role: "lunch", safety: { level: "high", label: "High Hazard — no swimming", url: "https://safebeachday.com/county/kauai/" } },
       { name: "Keoki's Paradise", lat: 21.8790, lon: -159.4598, role: "dinner" }
     ],
     gear: "Real-traction hiking shoes, 2–3L water/person, trail snacks, sunscreen, rain layer, dry bag, first aid, spare socks, cash/ID for shuttle",
@@ -718,6 +720,30 @@ async function getForecastForLocation(locKey){
   return p;
 }
 
+// ---- Live UV Index (currentuvindex.com, free, no key needed) ----
+const uvCache = {};
+async function getUVForLocation(locKey){
+  if(uvCache[locKey]) return uvCache[locKey];
+  const {lat, lon} = LOCATIONS[locKey];
+  const p = (async () => {
+    const res = await fetch(`https://currentuvindex.com/api/v1/uvi?latitude=${lat}&longitude=${lon}`);
+    if(!res.ok) throw new Error('UV fetch failed');
+    const data = await res.json();
+    if(!data.ok) throw new Error(data.message || 'UV data unavailable');
+    return data; // { now: {time, uvi}, forecast: [...] }
+  })();
+  uvCache[locKey] = p;
+  return p;
+}
+
+function uvRisk(uvi){
+  if(uvi >= 11) return { label: 'Extreme', color: '#8a3fb7' };
+  if(uvi >= 8)  return { label: 'Very High', color: '#c23b3b' };
+  if(uvi >= 6)  return { label: 'High', color: '#d1a53c' };
+  if(uvi >= 3)  return { label: 'Moderate', color: '#3f8a5c' };
+  return { label: 'Low', color: '#4fb3a3' };
+}
+
 function to12Hour(hhmm){
   let [h, m] = hhmm.split(':').map(Number);
   const period = h >= 12 ? 'PM' : 'AM';
@@ -791,12 +817,29 @@ function liveSafetyLevel(baseLevel, fc){
   return { level, reason };
 }
 
+function extractMiddayUV(uvData, dateStr){
+  const all = [...(uvData.history||[]), uvData.now, ...(uvData.forecast||[])].filter(Boolean);
+  const sameDate = all.filter(e => e.time.slice(0,10) === dateStr);
+  if(!sameDate.length) return null;
+  let best = sameDate[0];
+  let bestDiff = Math.abs(parseInt(best.time.slice(11,13),10) - 22); // 22:00 UTC ≈ noon HST
+  for(const e of sameDate){
+    const diff = Math.abs(parseInt(e.time.slice(11,13),10) - 22);
+    if(diff < bestDiff){ best = e; bestDiff = diff; }
+  }
+  return best.uvi;
+}
+
 async function renderConditions(i){
   const d = DAYS[i];
   const el = document.getElementById('conditionsBox-'+i);
   if(!el) return;
   try{
-    const [forecastMap, tideMap] = await Promise.all([getForecastForLocation(d.loc), getTideMap()]);
+    const [forecastMap, tideMap, uvData] = await Promise.all([
+      getForecastForLocation(d.loc),
+      getTideMap(),
+      getUVForLocation(d.loc).catch(() => null)
+    ]);
     const fc = forecastMap[d.date];
     const tides = tideMap[d.date] || [];
     const weatherHtml = fc
@@ -805,14 +848,20 @@ async function renderConditions(i){
     const tideHtml = tides.length
       ? tides.map(t => `<span class="tide-chip ${t.type==='L'?'low':''}">${t.type==='H'?'High':'Low'} ${t.time} · ${t.height}ft</span>`).join('')
       : `<div class="cv muted">Tide data unavailable</div>`;
+    const uvi = uvData ? extractMiddayUV(uvData, d.date) : null;
+    const uvHtml = uvi != null
+      ? `<div class="cv"><b>${uvi.toFixed ? uvi.toFixed(1) : uvi}</b> — <span style="color:${uvRisk(uvi).color};font-weight:700;">${uvRisk(uvi).label}</span><br><span class="muted">Near local noon · reapply sunscreen every 2 hrs outdoors</span></div>`
+      : `<div class="cv muted">UV forecast only covers ~5 days out — check back closer to the day.</div>`;
     el.innerHTML = `
       <div class="cond-block"><div class="dl">Weather · ${LOCATIONS[d.loc].name}</div>${weatherHtml}</div>
       <div class="cond-block"><div class="dl">Tides · nearest station (Nawiliwili)</div><div class="cv">${tideHtml}</div></div>
+      <div class="cond-block"><div class="dl">UV Index · midday</div>${uvHtml}</div>
     `;
     const mapChip = document.getElementById('map-weather-'+i);
     if(mapChip){
+      const uvBadge = uvi != null ? ` · <span style="color:${uvRisk(uvi).color};">UV ${uvi.toFixed ? uvi.toFixed(0) : uvi}</span>` : '';
       mapChip.innerHTML = fc
-        ? `${weatherIcon(fc.shortForecast)} <span>${fc.temperature}°${fc.temperatureUnit}</span>`
+        ? `${weatherIcon(fc.shortForecast)} <span>${fc.temperature}°${fc.temperatureUnit}</span>${uvBadge}`
         : `<span class="muted">No forecast yet</span>`;
     }
     const levelLabel = { low: "Normal", caution: "Caution", high: "High Hazard" };
@@ -844,19 +893,20 @@ DAYS.forEach((d,i)=>{
   let areaInfoHtml = (loc.info || []).map(l=>`<a href="${l.url}" target="_blank" rel="noopener">${l.label} ↗</a>`).join('<br>');
   let notesHtml = d.notes.length ? `<ul style="margin:10px 0 0;padding-left:18px;font-size:13px;color:var(--ink-soft);line-height:1.6;">${d.notes.map(n=>`<li>${n}</li>`).join('')}</ul>` : '';
 
-  const safetyStops = (d.stops || []).filter(s => s.safety);
+  const stopsArr = d.stops || [];
+  const safetyStops = stopsArr.filter(s => s.safety);
   const levelLabel = { low: "Normal", caution: "Caution", high: "High Hazard" };
   let beachSafetyHtml = '';
   if(safetyStops.length){
     beachSafetyHtml = `<div class="beach-safety">
       <div class="dl">Beach Safety <span class="muted" style="font-weight:500;text-transform:none;letter-spacing:0;">— updates live</span></div>
-      ${safetyStops.map((s,si) => `
+      ${stopsArr.map((s,si) => s.safety ? `
         <div class="safety-row">
           <span class="safety-pill ${s.safety.level}" id="safety-pill-${i}-${si}">${levelLabel[s.safety.level]}</span>
           <span class="safety-name">${s.name}</span>
           <a class="safety-link" href="${s.safety.url}" target="_blank" rel="noopener">Check live conditions ↗</a>
         </div>
-      `).join('')}
+      ` : '').join('')}
       <div class="safety-disclaimer">Auto-recalculated from live NWS wind &amp; weather data each time this page loads — this is our own simplified estimate, not SafeBeachDay's official feed (no public API exists for that). Always check safebeachday.com or with a lifeguard before swimming.</div>
     </div>`;
   }
